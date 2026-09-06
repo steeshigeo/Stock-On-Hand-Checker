@@ -5,39 +5,35 @@ import base64
 import requests
 import pandas as pd
 
-ONEDRIVE_RAW_URL = os.environ.get("ONEDRIVE_URL", "")
+# Ambil dan bersihkan URL dari karakter tak terduga (petik, spasi, kurung)
+raw_url = os.environ.get("ONEDRIVE_URL", "").strip()
+raw_url = raw_url.strip("'\"[]()")
+if raw_url and not raw_url.startswith("http://") and not raw_url.startswith("https://"):
+    raw_url = "https://" + raw_url
+
+ONEDRIVE_RAW_URL = raw_url
 
 def download_excel_bytes(url):
-    """
-    Mengunduh file Excel dari OneDrive menggunakan beberapa strategi otomatis:
-    1. Microsoft Graph API v1.0 (resmi)
-    2. Resolusi redirect & direct download link
-    3. Parameter download=1
-    """
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
     }
     session = requests.Session()
     session.headers.update(headers)
 
-    # Metode 1: Microsoft Graph API (Modern Endpoint)
+    # Metode 1: Direct Parameter on Shortlink (Paling Stabil)
     try:
-        encoded = base64.b64encode(url.encode('utf-8')).decode('utf-8')
-        url_safe = encoded.replace('+', '-').replace('/', '_').rstrip('=')
-        graph_url = f"https://graph.microsoft.com/v1.0/shares/u!{url_safe}/driveItem/content"
-        
-        res = session.get(graph_url, timeout=30, allow_redirects=True)
-        if res.status_code == 200 and len(res.content) > 1000:
-            print("Berhasil mengunduh Excel via Microsoft Graph API.")
+        direct_url = url + ("&download=1" if "?" in url else "?download=1")
+        res = session.get(direct_url, timeout=30, allow_redirects=True)
+        if res.status_code == 200 and len(res.content) > 500:
+            print("Berhasil mengunduh Excel via Direct Shortlink Parameter.")
             return res.content
     except Exception as e:
-        print(f"Metode Graph API dilewati: {e}")
+        print(f"Metode 1 (Direct Parameter) dilewati: {e}")
 
-    # Metode 2: Resolusi Redirect 1drv.ms & ubah ke Direct Download
+    # Metode 2: Redirect Resolution
     try:
         res = session.get(url, timeout=30, allow_redirects=True)
         final_url = res.url
-        
         if "view.aspx" in final_url:
             download_url = final_url.replace("view.aspx", "download.aspx")
         elif "download=1" not in final_url:
@@ -46,21 +42,24 @@ def download_excel_bytes(url):
             download_url = final_url
 
         res = session.get(download_url, timeout=30, allow_redirects=True)
-        if res.status_code == 200 and len(res.content) > 1000:
-            print("Berhasil mengunduh Excel via Direct Redirect Download.")
+        if res.status_code == 200 and len(res.content) > 500:
+            print("Berhasil mengunduh Excel via Redirect Resolution.")
             return res.content
     except Exception as e:
-        print(f"Metode Redirect dilewati: {e}")
+        print(f"Metode 2 (Redirect Resolution) dilewati: {e}")
 
-    # Metode 3: Parameter Direct Download langsung pada Shortlink
+    # Metode 3: Microsoft Graph API
     try:
-        direct_url = url + ("&download=1" if "?" in url else "?download=1")
-        res = session.get(direct_url, timeout=30, allow_redirects=True)
-        if res.status_code == 200 and len(res.content) > 1000:
-            print("Berhasil mengunduh Excel via Direct URL Parameter.")
+        encoded = base64.b64encode(url.encode('utf-8')).decode('utf-8')
+        url_safe = encoded.replace('+', '-').replace('/', '_').rstrip('=')
+        graph_url = f"https://graph.microsoft.com/v1.0/shares/u!{url_safe}/driveItem/content"
+        
+        res = session.get(graph_url, timeout=30, allow_redirects=True)
+        if res.status_code == 200 and len(res.content) > 500:
+            print("Berhasil mengunduh Excel via Microsoft Graph API.")
             return res.content
     except Exception as e:
-        print(f"Metode Direct Parameter dilewati: {e}")
+        print(f"Metode 3 (Graph API) dilewati: {e}")
 
     raise Exception("Gagal mengunduh file Excel dari seluruh metode OneDrive.")
 
