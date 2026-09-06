@@ -7,23 +7,69 @@ import pandas as pd
 
 ONEDRIVE_RAW_URL = os.environ.get("ONEDRIVE_URL", "")
 
-def get_onedrive_direct_url(url):
-    if not url:
-        return ""
-    if "api.onedrive.com" in url:
-        return url
-    encoded = base64.b64encode(url.encode('utf-8')).decode('utf-8')
-    url_safe = encoded.replace('+', '-').replace('/', '_').rstrip('=')
-    return f"https://api.onedrive.com/v1.0/shares/u!{url_safe}/root/content"
+def download_excel_bytes(url):
+    """
+    Mengunduh file Excel dari OneDrive menggunakan beberapa strategi otomatis:
+    1. Microsoft Graph API v1.0 (resmi)
+    2. Resolusi redirect & direct download link
+    3. Parameter download=1
+    """
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+    }
+    session = requests.Session()
+    session.headers.update(headers)
+
+    # Metode 1: Microsoft Graph API (Modern Endpoint)
+    try:
+        encoded = base64.b64encode(url.encode('utf-8')).decode('utf-8')
+        url_safe = encoded.replace('+', '-').replace('/', '_').rstrip('=')
+        graph_url = f"https://graph.microsoft.com/v1.0/shares/u!{url_safe}/driveItem/content"
+        
+        res = session.get(graph_url, timeout=30, allow_redirects=True)
+        if res.status_code == 200 and len(res.content) > 1000:
+            print("Berhasil mengunduh Excel via Microsoft Graph API.")
+            return res.content
+    except Exception as e:
+        print(f"Metode Graph API dilewati: {e}")
+
+    # Metode 2: Resolusi Redirect 1drv.ms & ubah ke Direct Download
+    try:
+        res = session.get(url, timeout=30, allow_redirects=True)
+        final_url = res.url
+        
+        if "view.aspx" in final_url:
+            download_url = final_url.replace("view.aspx", "download.aspx")
+        elif "download=1" not in final_url:
+            download_url = final_url + ("&download=1" if "?" in final_url else "?download=1")
+        else:
+            download_url = final_url
+
+        res = session.get(download_url, timeout=30, allow_redirects=True)
+        if res.status_code == 200 and len(res.content) > 1000:
+            print("Berhasil mengunduh Excel via Direct Redirect Download.")
+            return res.content
+    except Exception as e:
+        print(f"Metode Redirect dilewati: {e}")
+
+    # Metode 3: Parameter Direct Download langsung pada Shortlink
+    try:
+        direct_url = url + ("&download=1" if "?" in url else "?download=1")
+        res = session.get(direct_url, timeout=30, allow_redirects=True)
+        if res.status_code == 200 and len(res.content) > 1000:
+            print("Berhasil mengunduh Excel via Direct URL Parameter.")
+            return res.content
+    except Exception as e:
+        print(f"Metode Direct Parameter dilewati: {e}")
+
+    raise Exception("Gagal mengunduh file Excel dari seluruh metode OneDrive.")
 
 def fetch_and_parse_excel(url):
-    direct_url = get_onedrive_direct_url(url)
-    response = requests.get(direct_url, timeout=30)
-    response.raise_for_status()
+    content = download_excel_bytes(url)
     
     excel_path = "temp_soh.xlsx"
     with open(excel_path, "wb") as f:
-        f.write(response.content)
+        f.write(content)
         
     xl = pd.ExcelFile(excel_path)
     all_rows = []
