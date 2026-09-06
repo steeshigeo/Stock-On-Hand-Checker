@@ -1,0 +1,1132 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SOH Stock Checker - Digimap Tunjungan Plaza 3</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- SheetJS CDN untuk membaca file Excel (.xlsx) & CSV langsung di browser -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            900: '#0c4a6e',
+                        },
+                        darkbg: '#0f172a',
+                        cardbg: '#1e293b',
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Font Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: rgba(148, 163, 184, 0.1);
+            border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #64748b;
+            border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #475569;
+        }
+        .glass-card {
+            backdrop-filter: blur(12px);
+        }
+        @keyframes spin-sync {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .spin-active {
+            animation: spin-sync 0.8s linear infinite;
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-slate-100 text-slate-800 dark:bg-slate-900 dark:text-slate-100 flex flex-col custom-scrollbar">
+
+    <!-- Top Navigation Header -->
+    <header class="sticky top-0 z-40 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-4 lg:px-8 py-3.5 shadow-sm transition-colors">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+            
+            <!-- Store Title & Branding -->
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-sky-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-sky-500/20 text-white font-bold text-xl tracking-wider shrink-0">
+                    SOH
+                </div>
+                <div>
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <h1 class="text-lg font-bold tracking-tight text-slate-900 dark:text-white">Stock On Hand Checker</h1>
+                        <span class="text-[10px] font-bold text-amber-600 dark:text-amber-400 bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded-full uppercase tracking-wider">beta</span>
+                        
+                        <!-- Status Sync Indicator Beranda -->
+                        <div id="syncStatusBadge" title="Status Sinkronisasi Data" class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-wider uppercase bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 transition-all">
+                            <span id="syncStatusDot" class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                            <span id="syncStatusText">Synced</span>
+                        </div>
+                    </div>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1.5 mt-0.5">
+                        <svg class="w-3.5 h-3.5 text-slate-400 dark:text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                        <span id="storeNameText" class="font-medium text-slate-700 dark:text-slate-300">M121 - DIGIMAP TUNJUNGAN PLAZA 3 SURABAYA</span>
+                    </p>
+                </div>
+            </div>
+
+            <!-- Header Controls & Timestamp Status -->
+            <div class="flex items-center flex-wrap gap-2.5 justify-between md:justify-end">
+                
+                <!-- Date & Time Detail Badge -->
+                <div class="hidden sm:flex flex-col text-right px-3 py-1.5 rounded-lg bg-slate-200/80 dark:bg-slate-800/80 border border-slate-300/60 dark:border-slate-700/60">
+                    <div class="text-[11px] text-slate-500 dark:text-slate-400 flex items-center justify-end gap-1">
+                        <svg class="w-3 h-3 text-sky-500 dark:text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                        Tanggal XLS Raw: <span id="rawDateText" class="font-semibold text-slate-800 dark:text-slate-200">30-08-2026</span>
+                    </div>
+                    <div class="text-[11px] text-slate-500 dark:text-slate-400 flex items-center justify-end gap-1 mt-0.5">
+                        <svg class="w-3 h-3 text-emerald-500 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        Jam RAW: <span id="rawTimeText" class="font-semibold text-emerald-600 dark:text-emerald-400">09:32:25 WIB</span>
+                    </div>
+                </div>
+
+                <!-- Combined Settings Button -->
+                <button onclick="openSettingsModal()" title="Pengaturan Dashboard" class="px-3.5 py-2 rounded-xl bg-slate-200 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-200 font-medium text-xs flex items-center gap-2 shadow-sm transition">
+                    <svg class="w-4 h-4 text-sky-500 dark:text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    <span>Settings</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Date/Time Summary Bar -->
+        <div class="sm:hidden flex items-center justify-between pt-2.5 mt-2.5 border-t border-slate-200 dark:border-slate-800 text-[11px] text-slate-500 dark:text-slate-400">
+            <span class="flex items-center gap-1">
+                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                RAW: <strong id="rawDateMobile" class="text-slate-700 dark:text-slate-200">30-08-2026</strong>
+            </span>
+            <span>Jam: <strong id="rawTimeMobile" class="text-emerald-600 dark:text-emerald-400">09:32:25 WIB</strong></span>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 lg:px-8 py-6 space-y-6">
+
+        <!-- Summary Metric Cards Grid -->
+        <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-5 gap-3.5">
+            
+            <!-- Card 1: Total SOH -->
+            <div class="glass-card bg-white/80 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 transition-all">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Total Unit SOH</span>
+                    <span class="p-2 rounded-xl bg-sky-500/10 text-sky-500 dark:text-sky-400">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+                    </span>
+                </div>
+                <div class="mt-2 flex items-baseline gap-2">
+                    <span id="metricTotalUnits" class="text-2xl lg:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">635</span>
+                    <span class="text-xs text-slate-500 dark:text-slate-400">unit</span>
+                </div>
+                <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-1">Seluruh Perangkat Apple</p>
+            </div>
+
+            <!-- Card 2: iPhone Stock -->
+            <div onclick="selectCategory('iPhone')" class="glass-card bg-white/80 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 cursor-pointer transition-all border-l-4 border-l-sky-500 hover:border-sky-400">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">iPhone</span>
+                    <span class="p-2 rounded-xl bg-sky-500/10 text-sky-500 dark:text-sky-400">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+                    </span>
+                </div>
+                <div class="mt-2 flex items-baseline gap-2">
+                    <span id="metricIPhone" class="text-2xl lg:text-3xl font-extrabold text-sky-600 dark:text-sky-400 tracking-tight">444</span>
+                    <span class="text-xs text-slate-500 dark:text-slate-400">unit</span>
+                </div>
+                <p id="metricIPhoneCount" class="text-[11px] text-slate-500 dark:text-slate-400 mt-1">61 Varian Artikel</p>
+            </div>
+
+            <!-- Card 3: iPad Stock -->
+            <div onclick="selectCategory('iPad')" class="glass-card bg-white/80 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 cursor-pointer transition-all border-l-4 border-l-indigo-500 hover:border-indigo-400">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">iPad</span>
+                    <span class="p-2 rounded-xl bg-indigo-500/10 text-indigo-500 dark:text-indigo-400">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2"/></svg>
+                    </span>
+                </div>
+                <div class="mt-2 flex items-baseline gap-2">
+                    <span id="metricIPad" class="text-2xl lg:text-3xl font-extrabold text-indigo-600 dark:text-indigo-400 tracking-tight">60</span>
+                    <span class="text-xs text-slate-500 dark:text-slate-400">unit</span>
+                </div>
+                <p id="metricIPadCount" class="text-[11px] text-slate-500 dark:text-slate-400 mt-1">24 Varian Artikel</p>
+            </div>
+
+            <!-- Card 4: Mac Stock -->
+            <div onclick="selectCategory('Mac')" class="glass-card bg-white/80 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 cursor-pointer transition-all border-l-4 border-l-purple-500 hover:border-purple-400">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Macbook / Mac</span>
+                    <span class="p-2 rounded-xl bg-purple-500/10 text-purple-500 dark:text-purple-400">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                    </span>
+                </div>
+                <div class="mt-2 flex items-baseline gap-2">
+                    <span id="metricMac" class="text-2xl lg:text-3xl font-extrabold text-purple-600 dark:text-purple-400 tracking-tight">84</span>
+                    <span class="text-xs text-slate-500 dark:text-slate-400">unit</span>
+                </div>
+                <p id="metricMacCount" class="text-[11px] text-slate-500 dark:text-slate-400 mt-1">20 Varian Artikel</p>
+            </div>
+
+            <!-- Card 5: Watch & AirPods -->
+            <div class="glass-card bg-white/80 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 col-span-2 sm:col-span-2 lg:col-span-1 border-l-4 border-l-emerald-500">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Watch & AirPods</span>
+                    <span class="p-2 rounded-xl bg-emerald-500/10 text-emerald-500 dark:text-emerald-400">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    </span>
+                </div>
+                <div class="mt-2 flex items-center justify-between">
+                    <div>
+                        <div class="text-[10px] text-slate-500 dark:text-slate-400">Watch</div>
+                        <span id="metricWatch" class="text-xl font-bold text-emerald-600 dark:text-emerald-400">43</span> <span class="text-[10px] text-slate-500 dark:text-slate-400">unit</span>
+                    </div>
+                    <div class="border-l border-slate-300 dark:border-slate-700 pl-3">
+                        <div class="text-[10px] text-slate-500 dark:text-slate-400">AirPods</div>
+                        <span id="metricAirPods" class="text-xl font-bold text-emerald-600 dark:text-emerald-400">4</span> <span class="text-[10px] text-slate-500 dark:text-slate-400">unit</span>
+                    </div>
+                </div>
+                <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-1">16 Varian Aksesori Apple</p>
+            </div>
+
+        </div>
+
+        <!-- Controls Toolbar: Category Tabs, Search, Stock Filters -->
+        <div class="space-y-4">
+            
+            <!-- Category Chips Tabs -->
+            <div class="flex items-center gap-2 overflow-x-auto pb-1 custom-scrollbar scroll-smooth" id="categoryTabContainer">
+                <!-- Dynamically Rendered Category Buttons -->
+            </div>
+
+            <!-- Filter Controls Bar -->
+            <div class="glass-card bg-white/80 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-800 rounded-2xl p-3.5 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
+                
+                <!-- Search Box -->
+                <div class="relative flex-1">
+                    <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                    </div>
+                    <input type="text" id="searchInput" oninput="handleSearchInput()" placeholder="Cari Kode Artikel atau Nama Produk (misal: iPhone 17 Pro, M5, Ultra 3)..." class="w-full pl-10 pr-10 py-2 rounded-xl bg-slate-100 dark:bg-slate-900/90 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 text-xs focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 transition">
+                    <button id="clearSearchBtn" onclick="clearSearch()" class="hidden absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-300">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
+                </div>
+
+                <!-- Secondary Controls: Stock Filter, Sort, View Toggle -->
+                <div class="flex items-center flex-wrap gap-2.5 justify-between">
+                    
+                    <!-- Stock Level Filter -->
+                    <select id="stockFilterSelect" onchange="applyFilters()" class="py-2 px-3 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-200 text-xs focus:outline-none focus:border-sky-500 cursor-pointer">
+                        <option value="all">Semua Level Stock</option>
+                        <option value="high">Stock Melimpah (>10)</option>
+                        <option value="medium">Stock Medium (5-10)</option>
+                        <option value="low">Stock Menipis (1-4)</option>
+                        <option value="zero">Habis (0)</option>
+                    </select>
+
+                    <!-- Sort Selector -->
+                    <select id="sortSelect" onchange="applyFilters()" class="py-2 px-3 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-200 text-xs focus:outline-none focus:border-sky-500 cursor-pointer">
+                        <option value="qty-desc">Qty: Tertinggi → Terendah</option>
+                        <option value="qty-asc">Qty: Terendah → Tertinggi</option>
+                        <option value="desc-asc">Nama: A → Z</option>
+                        <option value="article-asc">Artikel: A → Z</option>
+                    </select>
+
+                    <!-- View Switcher (Table vs Cards) -->
+                    <div class="flex items-center bg-slate-100 dark:bg-slate-900 rounded-xl p-1 border border-slate-300 dark:border-slate-700">
+                        <button id="tableViewBtn" onclick="setViewMode('table')" class="p-1.5 rounded-lg text-xs font-medium text-slate-800 dark:text-white bg-white dark:bg-slate-800 shadow-sm transition" title="Tampilan Tabel (Laptop)">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                        </button>
+                        <button id="cardViewBtn" onclick="setViewMode('card')" class="p-1.5 rounded-lg text-xs font-medium text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white transition" title="Tampilan Kartu (Handphone)">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Active Filter Result Summary -->
+            <div class="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 px-1">
+                <div>
+                    Menampilkan <strong id="filterCountText" class="text-slate-800 dark:text-slate-200">0</strong> dari <strong id="totalCountText" class="text-slate-800 dark:text-slate-200">0</strong> varian produk
+                    <span id="activeCategoryName" class="ml-1 text-sky-600 dark:text-sky-400 font-medium">(Semua Kategori)</span>
+                </div>
+                <div>
+                    Total Qty Terfilter: <strong id="filterTotalQtyText" class="text-emerald-600 dark:text-emerald-400 font-bold">0</strong> unit
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Stock Table View (Laptop / Tablet Optimized) -->
+        <div id="tableViewContainer" class="glass-card bg-white/90 dark:bg-slate-800/90 rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 shadow-xl">
+            <div class="overflow-x-auto custom-scrollbar">
+                <table class="w-full text-left text-xs border-collapse">
+                    <thead>
+                        <tr class="bg-slate-100 dark:bg-slate-800/90 text-slate-600 dark:text-slate-300 font-semibold uppercase tracking-wider border-b border-slate-200 dark:border-slate-700">
+                            <th class="py-3.5 px-4 w-12 text-center">#</th>
+                            <th class="py-3.5 px-4 w-28">Kategori</th>
+                            <th class="py-3.5 px-4 w-36">SAP Article</th>
+                            <th class="py-3.5 px-4">Deskripsi Produk</th>
+                            <th class="py-3.5 px-4 w-28 text-center">Status</th>
+                            <th class="py-3.5 px-4 w-28 text-right">Jumlah SOH</th>
+                        </tr>
+                    </thead>
+                    <tbody id="stockTableBody" class="font-normal">
+                        <!-- Table Rows Rendered via JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Stock Card View (Handphone / Touch Device Optimized) -->
+        <div id="cardViewContainer" class="hidden grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
+            <!-- Cards Rendered via JS -->
+        </div>
+
+        <!-- Empty State Container -->
+        <div id="emptyState" class="hidden glass-card bg-white/90 dark:bg-slate-800/90 rounded-2xl p-12 text-center my-6 border border-slate-200 dark:border-slate-800">
+            <div class="w-16 h-16 rounded-2xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center mx-auto text-slate-400 dark:text-slate-500 mb-3">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+            </div>
+            <h3 class="text-base font-semibold text-slate-800 dark:text-slate-200">Tidak Ada Produk Ditemukan</h3>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-md mx-auto">Coba ubah kata kunci pencarian atau sesuaikan filter level stock yang dipilih.</p>
+            <button onclick="resetAllFilters()" class="mt-4 px-4 py-2 rounded-xl bg-sky-500/10 text-sky-600 dark:text-sky-400 border border-sky-500/30 text-xs font-medium hover:bg-sky-500/20 transition">
+                Reset Filter Pencarian
+            </button>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="mt-auto border-t border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 py-4 px-4 text-center text-xs text-slate-500 dark:text-slate-500 transition-colors">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
+            <div>
+                © 2026 DIGIMAP M121 Tunjungan Plaza 3 Surabaya • Sales & Stock Dashboard
+            </div>
+            <div class="flex items-center gap-3">
+                <button onclick="openSettingsModal()" class="text-sky-600 dark:text-sky-400 hover:underline">Pengaturan Dashboard</button>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Settings & Modal -->
+    <div id="settingsModal" class="fixed inset-0 z-50 bg-slate-950/60 dark:bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+        <div class="glass-card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl max-w-md w-full p-6 space-y-5 shadow-2xl relative transition-all">
+            
+            <!-- Modal Header -->
+            <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-8 h-8 rounded-lg bg-sky-500/10 text-sky-500 dark:text-sky-400 flex items-center justify-center">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    </div>
+                    <div>
+                        <h3 class="text-base font-bold text-slate-900 dark:text-white">Pengaturan Dashboard</h3>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">Konfigurasi sinkronisasi, tampilan & reset</p>
+                    </div>
+                </div>
+                <button onclick="closeSettingsModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-white p-1">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+
+            <!-- Modal Content Body -->
+            <div class="space-y-4 text-xs">
+                
+                <!-- 1. Appearance / Theme Toggle (Device Default / Light / Dark) -->
+                <div>
+                    <label class="block font-semibold text-slate-800 dark:text-slate-200 mb-2">Tampilan (Appearance):</label>
+                    <div class="grid grid-cols-3 gap-2">
+                        <button id="themeDeviceBtn" onclick="setThemeMode('system')" class="py-2 px-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-medium flex items-center justify-center gap-1.5 hover:border-sky-500 transition">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                            <span>Sistem</span>
+                        </button>
+                        <button id="themeLightBtn" onclick="setThemeMode('light')" class="py-2 px-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-medium flex items-center justify-center gap-1.5 hover:border-sky-500 transition">
+                            <svg class="w-3.5 h-3.5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+                            <span>Light</span>
+                        </button>
+                        <button id="themeDarkBtn" onclick="setThemeMode('dark')" class="py-2 px-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-medium flex items-center justify-center gap-1.5 hover:border-sky-500 transition">
+                            <svg class="w-3.5 h-3.5 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+                            <span>Dark</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="border-t border-slate-200 dark:border-slate-800 pt-3"></div>
+
+                <!-- 2. OneDrive Config Link -->
+                <div>
+                    <label class="block font-semibold text-slate-800 dark:text-slate-200 mb-1">Link Share OneDrive / Direct Link:</label>
+                    <input type="url" id="oneDriveUrlInput" placeholder="https://1drv.ms/... atau link langsung download" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-100 focus:outline-none focus:border-sky-500 font-mono text-xs">
+                    <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-1.5 leading-relaxed">
+                        💡 Tempelkan link share OneDrive (`1drv.ms/x/...`) yang dapat diakses publik.
+                    </p>
+                </div>
+
+                <!-- 3. Local File Manual Upload -->
+                <div class="pt-1">
+                    <label class="block font-semibold text-slate-800 dark:text-slate-200 mb-1">Atau Upload File Raw (.xlsx / .csv):</label>
+                    <input type="file" id="localFileInput" accept=".xlsx,.xls,.csv" class="block w-full text-xs text-slate-500 dark:text-slate-400 file:mr-3 file:py-2 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-sky-500/10 file:text-sky-600 dark:file:text-sky-400 hover:file:bg-sky-500/20 cursor-pointer">
+                </div>
+
+                <div class="border-t border-slate-200 dark:border-slate-800 pt-3"></div>
+
+                <!-- 4. Sync Manual & Reset All Action Buttons inside Settings -->
+                <div class="space-y-2">
+                    <label class="block font-semibold text-slate-800 dark:text-slate-200">Aksi Dashboard:</label>
+                    <div class="grid grid-cols-2 gap-2.5">
+                        <!-- Sync Manual Button -->
+                        <button id="syncBtnModal" onclick="triggerManualSync()" class="w-full px-3.5 py-2.5 rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-white font-semibold text-xs flex items-center justify-center gap-2 shadow-md shadow-sky-500/20 transition active:scale-95">
+                            <svg id="syncIconModal" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                            <span>Sync Manual</span>
+                        </button>
+
+                        <!-- Reset All Button -->
+                        <button onclick="resetAllDashboard()" class="w-full px-3.5 py-2.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-600 dark:text-rose-400 font-semibold text-xs flex items-center justify-center gap-2 transition active:scale-95">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                            <span>Reset All</span>
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="flex items-center justify-end gap-2.5 border-t border-slate-200 dark:border-slate-800 pt-3">
+                <button onclick="closeSettingsModal()" class="px-4 py-2 rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-700 text-xs font-medium">Tutup</button>
+                <button onclick="saveOneDriveConfig()" class="px-4 py-2 rounded-xl bg-sky-500 hover:bg-sky-400 text-white text-xs font-semibold shadow-lg shadow-sky-500/20">Simpan Link OneDrive</button>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="toastNotification" class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
+        <div class="glass-card bg-white dark:bg-slate-800 border border-sky-500/40 rounded-2xl p-3.5 px-4 shadow-2xl flex items-center gap-3 text-slate-800 dark:text-slate-100">
+            <div id="toastIconContainer" class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-500 dark:text-emerald-400 flex items-center justify-center shrink-0">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+            </div>
+            <div>
+                <div id="toastTitle" class="text-xs font-bold">Sync Berhasil</div>
+                <div id="toastMessage" class="text-[11px] text-slate-500 dark:text-slate-300">Data SOH telah diperbarui.</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Application JavaScript Engine -->
+    <script>
+        // Data Stok Bawaan dari Tab SOH Excel M121
+        const INITIAL_SOH_DATA = {"iPhone": {"grand_total": 444, "items": [{"article": "APPMG2U4ID/A", "description": "IPHONE AIR 512GB LIGHT GOLD", "qty": 1}, {"article": "APPMG2T4ID/A", "description": "IPHONE AIR 512GB CLOUD WHITE", "qty": 1}, {"article": "APPMG2L4ID/A", "description": "IPHONE AIR 256GB SPACE BLACK", "qty": 1}, {"article": "APPMG2P4ID/A", "description": "IPHONE AIR 256GB SKY BLUE", "qty": 5}, {"article": "APPMG2N4ID/A", "description": "IPHONE AIR 256GB LIGHT GOLD", "qty": 4}, {"article": "APPMG2M4ID/A", "description": "IPHONE AIR 256GB CLOUD WHITE", "qty": 2}, {"article": "APPMHU04ID/A", "description": "IPHONE 17E 512GB WHITE", "qty": 1}, {"article": "APPMHU34ID/A", "description": "IPHONE 17E 512GB SOFT PINK", "qty": 1}, {"article": "APPMHRY4ID/A", "description": "IPHONE 17E 512GB BLACK", "qty": 1}, {"article": "APPMHRX4ID/A", "description": "IPHONE 17E 256GB SOFT PINK", "qty": 3}, {"article": "APPMHRV4ID/A", "description": "IPHONE 17E 256GB BLACK", "qty": 1}, {"article": "APPMFYQ4ID/A", "description": "IPHONE 17 PRO MAX 512GB SILVER", "qty": 11}, {"article": "APPMFYT4ID/A", "description": "IPHONE 17 PRO MAX 512GB COSMIC ORANGE", "qty": 7}, {"article": "APPMFYM4ID/A", "description": "IPHONE 17 PRO MAX 256GB SILVER", "qty": 28}, {"article": "APPMFYP4ID/A", "description": "IPHONE 17 PRO MAX 256GB DEEP BLUE", "qty": 15}, {"article": "APPMFYN4ID/A", "description": "IPHONE 17 PRO MAX 256GB COSMIC ORANGE", "qty": 28}, {"article": "APPMFYV4ID/A", "description": "IPHONE 17 PRO MAX 1TB SILVER", "qty": 5}, {"article": "APPMFYX4ID/A", "description": "IPHONE 17 PRO MAX 1TB DEEP BLUE", "qty": 1}, {"article": "APPMG8K4ID/A", "description": "IPHONE 17 PRO 512GB SILVER", "qty": 6}, {"article": "APPMG8N4ID/A", "description": "IPHONE 17 PRO 512GB DEEP BLUE", "qty": 2}, {"article": "APPMG8M4ID/A", "description": "IPHONE 17 PRO 512GB COSMIC ORANGE", "qty": 1}, {"article": "APPMG8G4ID/A", "description": "IPHONE 17 PRO 256GB SILVER", "qty": 11}, {"article": "APPMG8J4ID/A", "description": "IPHONE 17 PRO 256GB DEEP BLUE", "qty": 84}, {"article": "APPMG8H4ID/A", "description": "IPHONE 17 PRO 256GB COSMIC ORANGE", "qty": 20}, {"article": "APPMG8P4ID/A", "description": "IPHONE 17 PRO 1TB SILVER", "qty": 1}, {"article": "APPMG8Q4ID/A", "description": "IPHONE 17 PRO 1TB COSMIC ORANGE", "qty": 2}, {"article": "APPMG6Q4ID/A", "description": "IPHONE 17 512GB WHITE", "qty": 1}, {"article": "APPMG6K4ID/A", "description": "IPHONE 17 256GB WHITE", "qty": 20}, {"article": "APPMG6N4ID/A", "description": "IPHONE 17 256GB SAGE", "qty": 18}, {"article": "APPMG6L4ID/A", "description": "IPHONE 17 256GB MIST BLUE", "qty": 2}, {"article": "APPMG6M4ID/A", "description": "IPHONE 17 256GB LAVENDER", "qty": 18}, {"article": "APPMG6J4ID/A", "description": "IPHONE 17 256GB BLACK", "qty": 9}, {"article": "APPMY1X3ID/A", "description": "IPHONE 16 PLUS 512GB WHITE", "qty": 2}, {"article": "APPMY2D3ID/A", "description": "IPHONE 16 PLUS 512GB ULTRAMARINE", "qty": 2}, {"article": "APPMY2J3ID/A", "description": "IPHONE 16 PLUS 512GB TEAL", "qty": 2}, {"article": "APPMY253ID/A", "description": "IPHONE 16 PLUS 512GB PINK", "qty": 2}, {"article": "APPMY1P3ID/A", "description": "IPHONE 16 PLUS 512GB BLACK", "qty": 2}, {"article": "APPMXWV3ID/A", "description": "IPHONE 16 PLUS 256GB WHITE", "qty": 1}, {"article": "APPMXY23ID/A", "description": "IPHONE 16 PLUS 256GB ULTRAMARINE", "qty": 1}, {"article": "APPMXY53ID/A", "description": "IPHONE 16 PLUS 256GB TEAL", "qty": 1}, {"article": "APPMXY13ID/A", "description": "IPHONE 16 PLUS 256GB PINK", "qty": 1}, {"article": "APPMXVX3ID/A", "description": "IPHONE 16 PLUS 128GB ULTRAMARINE", "qty": 1}, {"article": "APPMXVY3ID/A", "description": "IPHONE 16 PLUS 128GB TEAL", "qty": 1}, {"article": "APPMXVW3ID/A", "description": "IPHONE 16 PLUS 128GB PINK", "qty": 1}, {"article": "APPMXVU3ID/A", "description": "IPHONE 16 PLUS 128GB BLACK", "qty": 1}, {"article": "APPMYER3ID/A", "description": "IPHONE 16 512GB ULTRAMARINE", "qty": 1}, {"article": "APPMYEU3ID/A", "description": "IPHONE 16 512GB TEAL", "qty": 1}, {"article": "APPMYE93ID/A", "description": "IPHONE 16 128GB WHITE", "qty": 4}, {"article": "APPMYEC3ID/A", "description": "IPHONE 16 128GB ULTRAMARINE", "qty": 10}, {"article": "APPMYED3ID/A", "description": "IPHONE 16 128GB TEAL", "qty": 8}, {"article": "APPMYEA3ID/A", "description": "IPHONE 16 128GB PINK", "qty": 11}, {"article": "APPMYE73ID/A", "description": "IPHONE 16 128GB BLACK", "qty": 6}, {"article": "APPMU1M3ID/A", "description": "IPHONE 15 PLUS 512GB YELLOW", "qty": 1}, {"article": "APPMTP73ID/A", "description": "IPHONE 15 256GB PINK", "qty": 6}, {"article": "APPMTP93ID/A", "description": "IPHONE 15 256GB BLUE", "qty": 11}, {"article": "APPMTP63ID/A", "description": "IPHONE 15 256GB BLACK", "qty": 18}, {"article": "APPMTP13ID/A", "description": "IPHONE 15 128GB PINK", "qty": 22}, {"article": "APPMTP43ID/A", "description": "IPHONE 15 128GB BLUE", "qty": 11}, {"article": "APPMTP03ID/A", "description": "IPHONE 15 128GB BLACK", "qty": 3}, {"article": "APPMPWW3ID/A", "description": "IPHONE 14 512GB MIDNIGHT", "qty": 1}, {"article": "APPMG6V4ID/A", "description": "PHONE 17 512GB SAGE", "qty": 1}]}, "iPad": {"grand_total": 60, "items": [{"article": "APPMP263PA/A", "description": "IPAD PRO 12.9 WF CL 2T GRY-PAC 6TH 2022", "qty": 1}, {"article": "APPME7Y4PA/A", "description": "IPAD PRO  13-INCH M5 WI-FI CELL 512GB SP", "qty": 1}, {"article": "APPME7W4PA/A", "description": "IPAD PRO  13-INCH M5 WI-FI CELL 256GB SP", "qty": 1}, {"article": "APPMDWM4PA/A", "description": "IPAD PRO  11-INCH M5 WI-FI 512GB SPACE B", "qty": 1}, {"article": "APPMDWK4PA/A", "description": "IPAD PRO  11-INCH M5 WI-FI 256GB SPACE B", "qty": 1}, {"article": "APPMDWP4PA/A", "description": "IPAD PRO  11-INCH M5 WI-FI 1TB SPACE BLA", "qty": 1}, {"article": "APPMXNC3PA/A", "description": "IPAD MINI 7 WIFI 256GB  BLUE", "qty": 1}, {"article": "APPMXN63PA/A", "description": "IPAD MINI 7 WIFI 128GB  SPACE GREY", "qty": 2}, {"article": "APPMXN93PA/A", "description": "IPAD MINI 7 WIFI 128GB  PURPLE", "qty": 2}, {"article": "APPMXN73PA/A", "description": "IPAD MINI 7 WIFI 128GB  BLUE", "qty": 2}, {"article": "APPMH5W4PA/A", "description": "IPAD AIR 13 WIFI 256GB STL M4", "qty": 1}, {"article": "APPMH5N4PA/A", "description": "IPAD AIR 13 WIFI 128GB SPG M4", "qty": 1}, {"article": "APPMH5P4PA/A", "description": "IPAD AIR 13 WIFI 128GB BLU M4", "qty": 1}, {"article": "APPMH354PA/A", "description": "IPAD AIR 11 WIFI 256GB SPG M4", "qty": 1}, {"article": "APPMH364PA/A", "description": "IPAD AIR 11 WIFI 256GB BLU M4", "qty": 1}, {"article": "APPMH3G4PA/A", "description": "IPAD AIR 11 WIFI 1TB SPG M4", "qty": 1}, {"article": "APPMH7F4PA/A", "description": "IPAD AIR 11 WF CL 256GB STL M4", "qty": 1}, {"article": "APPMH7E4PA/A", "description": "IPAD AIR 11 WF CL 256GB BLU M4", "qty": 1}, {"article": "APPMD4H4PA/A", "description": "IPAD 11TH WI-FI 256GB BLUE", "qty": 3}, {"article": "APPMD4D4PA/A", "description": "IPAD 11TH WI-FI 128GB YELLOW", "qty": 1}, {"article": "APPMD3Y4PA/A", "description": "IPAD 11TH WI-FI 128GB SILVER", "qty": 19}, {"article": "APPMD4E4PA/A", "description": "IPAD 11TH WI-FI 128GB PINK", "qty": 12}, {"article": "APPMD4A4PA/A", "description": "IPAD 11TH WI-FI 128GB BLUE", "qty": 3}, {"article": "APPMD7F4PA/A", "description": "IPAD 11TH WI-FI + CELLULAR 128GB SILVER", "qty": 1}]}, "Mac": {"grand_total": 84, "items": [{"article": "APPMGE44ID/A", "description": "MBP 16 SL/M5/PRO/18C/20CGPU/24GB/1T-IND", "qty": 1}, {"article": "APPMRW63ID/A", "description": "MBP 16 SL/M3/12C/18C GP/36G/512G-ID 23", "qty": 1}, {"article": "APPMR962ID/A", "description": "MBP 15.4/2.2GHZ(I7)/16GB/256GB/TB/SL", "qty": 1}, {"article": "APPMGDP4ID/A", "description": "MBP 14 SL/M5/PRO/18C/20CGPU/24GB/2T-IND", "qty": 1}, {"article": "APPMJLV4ID/A", "description": "MBP 14 SL/M5/PRO/15C/16CGPU/24GB/2T-IND", "qty": 5}, {"article": "APPMGDN4ID/A", "description": "MBP 14 SL/M5/PRO/15C/16CGPU/24GB/1T-IND", "qty": 2}, {"article": "APPMGDQ4ID/A", "description": "MBP 14 SL/M5/MAX/18C/32CGPU/36GB/2T-IND", "qty": 1}, {"article": "APPMJLW4ID/A", "description": "MBP 14 SB/M5/PRO/15C/16CGPU/24GB/2T-IND", "qty": 1}, {"article": "APPMDE34ID/A", "description": "MBP 14 SB/M5/10C/10C GPU/24GB/1TB-IND", "qty": 3}, {"article": "APPMDE14ID/A", "description": "MBP 14 SB/M5/10C/10C GPU/16GB/1TB-IND", "qty": 4}, {"article": "APPMHFC4ID/A", "description": "MBN 13 SLV/8GB/512GB-IND", "qty": 7}, {"article": "APPMHFA4ID/A", "description": "MBN 13 SLV/8GB/256GB-IND", "qty": 14}, {"article": "APPMHFG4ID/A", "description": "MBN 13 IND/8GB/512GB-IND", "qty": 11}, {"article": "APPMHFF4ID/A", "description": "MBN 13 IND/8GB/256GB-IND", "qty": 8}, {"article": "APPMHFE4ID/A", "description": "MBN 13 CIT/8GB/512GB-IND", "qty": 10}, {"article": "APPMHFD4ID/A", "description": "MBN 13 CIT/8GB/256GB-IND", "qty": 10}, {"article": "APPMHFH4ID/A", "description": "MBN 13 BLS/8GB/256GB-IND", "qty": 1}, {"article": "APPMDVQ4ID/A", "description": "MBA 15.3 SKY/M5/10C GPU/16GB/512GB-IND", "qty": 1}, {"article": "APPMDVK4ID/A", "description": "MBA 15.3 MDN/M5/10C GPU/16GB/1TB-IND", "qty": 1}, {"article": "APPMDHF4ID/A", "description": "MBA 13.6 MDN/M5/10C GPU/16GB/1TB-IND", "qty": 1}]}, "Apple Watch": {"grand_total": 43, "items": [{"article": "APPMEWM4ID/A", "description": "APPLE WATCH ULTRA3 49 NT TI LB ALP M-IND", "qty": 2}, {"article": "APPMEWU4ID/A", "description": "APPLE WATCH ULTRA3 49 N T B/BB TL ML-IND", "qty": 2}, {"article": "APPMF0J4ID/A", "description": "APPLE WATCH ULTRA3 49 BLACK TI BK OB-IND", "qty": 3}, {"article": "APPMF1Q4ID/A", "description": "APPLE WATCH ULTRA3 49 BK TI BK TML M-IND", "qty": 2}, {"article": "APPMF0V4ID/A", "description": "APPLE WATCH ULTRA3 49 BK TI BK ALP M-IND", "qty": 1}, {"article": "APPMF1H4ID/A", "description": "APPLE WATCH ULTRA3 49 BK TI BC TL ML-IND", "qty": 1}, {"article": "APPMEHJ4ID/A", "description": "APPLE WATCH SE 3 44 S AL S SB ML GPS-IND", "qty": 2}, {"article": "APPMEHQ4ID/A", "description": "APPLE WATCH SE 3 44 M AL M SB ML GPS-IND", "qty": 2}, {"article": "APPMEH34ID/A", "description": "APPLE WATCH SE 3 40 S AL S SB SM GPS-IND", "qty": 1}, {"article": "APPMEH94ID/A", "description": "APPLE WATCH SE 3 40 M AL M SB SM GPS-IND", "qty": 12}, {"article": "APPMEUX4ID/A", "description": "APPLE WATCH 11 46 JB AL BK SB ML GPS-IND", "qty": 4}, {"article": "APPMEU04ID/A", "description": "APPLE WATCH 11 42 RG AL LB SB SM GPS-IND", "qty": 11}]}, "AirPods": {"grand_total": 4, "items": [{"article": "APPMWTY3FE/A", "description": "EARPODS WITH LIGHTNING CONNECTOR", "qty": 1}, {"article": "APPMFHP4ID/A", "description": "AIRPODS PRO 3", "qty": 1}, {"article": "APPMXP93ID/A", "description": "AIRPODS 4 (ACTIVE NOISE CANCELLATION)", "qty": 1}, {"article": "APPMXP63ID/A", "description": "AIRPODS 4", "qty": 1}]}};
+        
+        let storeInfo = "M121 - DIGIMAP TUNJUNGAN PLAZA 3 SURABAYA";
+        let dateUpdated = "30-08-2026";
+        let timeUpdated = "09:32:25 WIB";
+        
+        let currentSOH = JSON.parse(JSON.stringify(INITIAL_SOH_DATA));
+        let activeCategory = 'all';
+        let searchQuery = '';
+        let stockFilter = 'all';
+        let sortOption = 'qty-desc';
+        let viewMode = 'table'; // 'table' or 'card'
+        let currentTheme = 'system'; // 'system', 'light', 'dark'
+
+        // Function Update Sync Status Badge di Beranda (Header)
+        function updateSyncStatus(state, customText) {
+            const badge = document.getElementById('syncStatusBadge');
+            const dot = document.getElementById('syncStatusDot');
+            const text = document.getElementById('syncStatusText');
+
+            if (!badge || !dot || !text) return;
+
+            if (state === 'syncing') {
+                badge.className = "inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-wider uppercase bg-sky-500/10 text-sky-600 dark:text-sky-400 border border-sky-500/20 transition-all";
+                dot.className = "w-2 h-2 rounded-full bg-sky-500 animate-ping";
+                text.textContent = customText || "Syncing...";
+            } else if (state === 'success') {
+                badge.className = "inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-wider uppercase bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 transition-all";
+                dot.className = "w-2 h-2 rounded-full bg-emerald-500 animate-pulse";
+                text.textContent = customText || "Synced";
+            } else if (state === 'failed') {
+                badge.className = "inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-wider uppercase bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20 transition-all";
+                dot.className = "w-2 h-2 rounded-full bg-rose-500";
+                text.textContent = customText || "Sync Gagal";
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initTheme();
+            loadSavedConfig();
+            renderMetrics();
+            renderCategoryTabs();
+            applyFilters();
+            setupAutoSyncScheduler();
+            updateSyncStatus('success', 'Synced');
+            
+            document.getElementById('localFileInput').addEventListener('change', handleLocalFileUpload);
+            
+            // Listen to device color scheme changes when mode is 'system'
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+                if (currentTheme === 'system') {
+                    applyThemeClass(e.matches ? 'dark' : 'light');
+                }
+            });
+        });
+
+        // Theme Initialization & Handler
+        function initTheme() {
+            const savedTheme = localStorage.getItem('soh_theme') || 'system';
+            setThemeMode(savedTheme, false);
+        }
+
+        function setThemeMode(mode, save = true) {
+            currentTheme = mode;
+            if (save) localStorage.setItem('soh_theme', mode);
+
+            // Update theme selector button UI
+            const deviceBtn = document.getElementById('themeDeviceBtn');
+            const lightBtn = document.getElementById('themeLightBtn');
+            const darkBtn = document.getElementById('themeDarkBtn');
+
+            const activeClass = 'border-sky-500 bg-sky-500/10 text-sky-600 dark:text-sky-400 font-bold';
+            const inactiveClass = 'border-slate-300 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-medium';
+
+            [deviceBtn, lightBtn, darkBtn].forEach(b => {
+                if (b) b.className = `py-2 px-2.5 rounded-xl border flex items-center justify-center gap-1.5 transition text-xs ${inactiveClass}`;
+            });
+
+            if (mode === 'system') {
+                if (deviceBtn) deviceBtn.className = `py-2 px-2.5 rounded-xl border flex items-center justify-center gap-1.5 transition text-xs ${activeClass}`;
+                const isDeviceDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                applyThemeClass(isDeviceDark ? 'dark' : 'light');
+            } else if (mode === 'light') {
+                if (lightBtn) lightBtn.className = `py-2 px-2.5 rounded-xl border flex items-center justify-center gap-1.5 transition text-xs ${activeClass}`;
+                applyThemeClass('light');
+            } else if (mode === 'dark') {
+                if (darkBtn) darkBtn.className = `py-2 px-2.5 rounded-xl border flex items-center justify-center gap-1.5 transition text-xs ${activeClass}`;
+                applyThemeClass('dark');
+            }
+        }
+
+        function applyThemeClass(targetTheme) {
+            const htmlEl = document.documentElement;
+            if (targetTheme === 'dark') {
+                htmlEl.classList.add('dark');
+            } else {
+                htmlEl.classList.remove('dark');
+            }
+        }
+
+        // Render Metrik Ringkasan
+        function renderMetrics() {
+            let totalUnits = 0;
+            let categoryTotals = {};
+            
+            Object.keys(currentSOH).forEach(cat => {
+                let catData = currentSOH[cat];
+                let catSum = catData.items.reduce((sum, item) => sum + item.qty, 0);
+                categoryTotals[cat] = {
+                    units: catSum,
+                    count: catData.items.length
+                };
+                totalUnits += catSum;
+            });
+
+            document.getElementById('metricTotalUnits').textContent = totalUnits.toLocaleString('id-ID');
+            
+            if(categoryTotals['iPhone']) {
+                document.getElementById('metricIPhone').textContent = categoryTotals['iPhone'].units.toLocaleString('id-ID');
+                document.getElementById('metricIPhoneCount').textContent = `${categoryTotals['iPhone'].count} Varian Artikel`;
+            }
+            if(categoryTotals['iPad']) {
+                document.getElementById('metricIPad').textContent = categoryTotals['iPad'].units.toLocaleString('id-ID');
+                document.getElementById('metricIPadCount').textContent = `${categoryTotals['iPad'].count} Varian Artikel`;
+            }
+            if(categoryTotals['Mac']) {
+                document.getElementById('metricMac').textContent = categoryTotals['Mac'].units.toLocaleString('id-ID');
+                document.getElementById('metricMacCount').textContent = `${categoryTotals['Mac'].count} Varian Artikel`;
+            }
+            if(categoryTotals['Apple Watch']) {
+                document.getElementById('metricWatch').textContent = categoryTotals['Apple Watch'].units.toLocaleString('id-ID');
+            }
+            if(categoryTotals['AirPods']) {
+                document.getElementById('metricAirPods').textContent = categoryTotals['AirPods'].units.toLocaleString('id-ID');
+            }
+
+            document.getElementById('rawDateText').textContent = dateUpdated;
+            document.getElementById('rawTimeText').textContent = timeUpdated;
+            document.getElementById('rawDateMobile').textContent = dateUpdated;
+            document.getElementById('rawTimeMobile').textContent = timeUpdated;
+        }
+
+        // Render Chip Filter Kategori
+        function renderCategoryTabs() {
+            const container = document.getElementById('categoryTabContainer');
+            container.innerHTML = '';
+
+            let categories = ['all', ...Object.keys(currentSOH)];
+            
+            categories.forEach(cat => {
+                let label = cat === 'all' ? 'Semua Kategori' : cat;
+                let count = 0;
+                if(cat === 'all') {
+                    Object.values(currentSOH).forEach(c => count += c.items.reduce((sum, i) => sum + i.qty, 0));
+                } else {
+                    count = currentSOH[cat] ? currentSOH[cat].items.reduce((sum, i) => sum + i.qty, 0) : 0;
+                }
+
+                let isActive = activeCategory === cat;
+                let btn = document.createElement('button');
+                btn.onclick = () => selectCategory(cat);
+                btn.className = `px-3.5 py-2 rounded-xl text-xs font-semibold shrink-0 transition flex items-center gap-2 border ${
+                    isActive 
+                    ? 'bg-sky-500 text-white border-sky-400 shadow-md shadow-sky-500/20' 
+                    : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 hover:text-slate-900 dark:hover:text-white'
+                }`;
+                
+                btn.innerHTML = `
+                    <span>${label}</span>
+                    <span class="px-1.5 py-0.5 rounded-md text-[10px] ${
+                        isActive ? 'bg-white/20 text-white' : 'bg-slate-100 dark:bg-slate-900 text-slate-500 dark:text-slate-400'
+                    }">${count}</span>
+                `;
+                container.appendChild(btn);
+            });
+        }
+
+        function selectCategory(cat) {
+            activeCategory = cat;
+            renderCategoryTabs();
+            applyFilters();
+        }
+
+        // Jalankan Filter, Pencarian & Sorting
+        function applyFilters() {
+            searchQuery = document.getElementById('searchInput').value.trim().toLowerCase();
+            stockFilter = document.getElementById('stockFilterSelect').value;
+            sortOption = document.getElementById('sortSelect').value;
+
+            let items = [];
+            Object.keys(currentSOH).forEach(cat => {
+                if(activeCategory === 'all' || activeCategory === cat) {
+                    currentSOH[cat].items.forEach(item => {
+                        items.push({
+                            category: cat,
+                            article: item.article,
+                            description: item.description,
+                            qty: item.qty
+                        });
+                    });
+                }
+            });
+
+            let totalCount = items.length;
+
+            if(searchQuery) {
+                items = items.filter(item => 
+                    item.description.toLowerCase().includes(searchQuery) ||
+                    item.article.toLowerCase().includes(searchQuery) ||
+                    item.category.toLowerCase().includes(searchQuery)
+                );
+            }
+
+            if(stockFilter === 'high') items = items.filter(i => i.qty > 10);
+            else if(stockFilter === 'medium') items = items.filter(i => i.qty >= 5 && i.qty <= 10);
+            else if(stockFilter === 'low') items = items.filter(i => i.qty >= 1 && i.qty < 5);
+            else if(stockFilter === 'zero') items = items.filter(i => i.qty === 0);
+
+            if(sortOption === 'qty-desc') items.sort((a, b) => b.qty - a.qty);
+            else if(sortOption === 'qty-asc') items.sort((a, b) => a.qty - b.qty);
+            else if(sortOption === 'desc-asc') items.sort((a, b) => a.description.localeCompare(b.description));
+            else if(sortOption === 'article-asc') items.sort((a, b) => a.article.localeCompare(b.article));
+
+            let filteredTotalQty = items.reduce((sum, i) => sum + i.qty, 0);
+
+            document.getElementById('filterCountText').textContent = items.length;
+            document.getElementById('totalCountText').textContent = totalCount;
+            document.getElementById('filterTotalQtyText').textContent = filteredTotalQty.toLocaleString('id-ID');
+            document.getElementById('activeCategoryName').textContent = activeCategory === 'all' ? '(Semua Kategori)' : `(${activeCategory})`;
+
+            document.getElementById('clearSearchBtn').classList.toggle('hidden', !searchQuery);
+
+            if(items.length === 0) {
+                document.getElementById('tableViewContainer').classList.add('hidden');
+                document.getElementById('cardViewContainer').classList.add('hidden');
+                document.getElementById('emptyState').classList.remove('hidden');
+            } else {
+                document.getElementById('emptyState').classList.add('hidden');
+                if(viewMode === 'table') {
+                    document.getElementById('tableViewContainer').classList.remove('hidden');
+                    document.getElementById('cardViewContainer').classList.add('hidden');
+                    renderTable(items);
+                } else {
+                    document.getElementById('tableViewContainer').classList.add('hidden');
+                    document.getElementById('cardViewContainer').classList.remove('hidden');
+                    renderCards(items);
+                }
+            }
+        }
+
+        // Render Baris Tabel
+        function renderTable(items) {
+            const tbody = document.getElementById('stockTableBody');
+            tbody.innerHTML = items.map((item, index) => {
+                let statusBadge = getStatusBadge(item.qty);
+                let catBadge = getCategoryBadgeStyle(item.category);
+                
+                return `
+                    <tr class="hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition">
+                        <td class="py-3 px-4 text-center text-slate-400 dark:text-slate-500 font-mono text-[11px] border-b border-slate-200 dark:border-slate-800/80">${index + 1}</td>
+                        <td class="py-3 px-4 border-b border-slate-200 dark:border-slate-800/80">
+                            <span class="inline-block px-2 py-0.5 rounded-md text-[10px] font-bold ${catBadge}">
+                                ${item.category}
+                            </span>
+                        </td>
+                        <td class="py-3 px-4 font-mono font-medium text-slate-600 dark:text-slate-300 text-[11px] select-all border-b border-slate-200 dark:border-slate-800/80">${item.article}</td>
+                        <td class="py-3 px-4 font-medium text-slate-900 dark:text-slate-100 text-xs border-b border-slate-200 dark:border-slate-800/80">${highlightSearch(item.description)}</td>
+                        <td class="py-3 px-4 text-center border-b border-slate-200 dark:border-slate-800/80">${statusBadge}</td>
+                        <td class="py-3 px-4 text-right font-extrabold text-sm border-b border-slate-200 dark:border-slate-800/80 ${item.qty > 0 ? 'text-slate-900 dark:text-white' : 'text-rose-500 dark:text-rose-400'}">
+                            ${item.qty.toLocaleString('id-ID')}
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // Render Kartu (Mobile)
+        function renderCards(items) {
+            const container = document.getElementById('cardViewContainer');
+            container.innerHTML = items.map((item) => {
+                let statusBadge = getStatusBadge(item.qty);
+                let catBadge = getCategoryBadgeStyle(item.category);
+
+                return `
+                    <div class="glass-card bg-white/90 dark:bg-slate-800/90 rounded-2xl p-4 flex flex-col justify-between gap-3 border border-slate-200 dark:border-slate-800">
+                        <div class="flex items-start justify-between gap-2">
+                            <span class="px-2 py-0.5 rounded-md text-[10px] font-bold ${catBadge}">
+                                ${item.category}
+                            </span>
+                            ${statusBadge}
+                        </div>
+                        <div>
+                            <h4 class="text-xs font-bold text-slate-900 dark:text-slate-100 leading-snug">${highlightSearch(item.description)}</h4>
+                            <p class="text-[11px] font-mono text-slate-500 dark:text-slate-400 mt-1 flex items-center justify-between">
+                                <span>Art: <strong class="text-slate-700 dark:text-slate-300 font-normal">${item.article}</strong></span>
+                            </p>
+                        </div>
+                        <div class="pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                            <span class="text-[11px] text-slate-500 dark:text-slate-400">Stock Tersedia</span>
+                            <div class="flex items-baseline gap-1">
+                                <span class="text-lg font-extrabold ${item.qty > 0 ? 'text-slate-900 dark:text-white' : 'text-rose-500 dark:text-rose-400'}">${item.qty.toLocaleString('id-ID')}</span>
+                                <span class="text-[10px] text-slate-500 dark:text-slate-400">unit</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function getStatusBadge(qty) {
+            if(qty > 10) {
+                return `<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">Melimpah</span>`;
+            } else if(qty >= 5) {
+                return `<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-sky-500/10 text-sky-600 dark:text-sky-400 border border-sky-500/20">Normal</span>`;
+            } else if(qty >= 1) {
+                return `<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">Menipis</span>`;
+            } else {
+                return `<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20">Habis</span>`;
+            }
+        }
+
+        function getCategoryBadgeStyle(cat) {
+            switch(cat) {
+                case 'iPhone': return 'bg-sky-500/10 text-sky-600 dark:text-sky-400 border border-sky-500/20';
+                case 'iPad': return 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20';
+                case 'Mac': return 'bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20';
+                case 'Apple Watch': return 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20';
+                case 'AirPods': return 'bg-teal-500/10 text-teal-600 dark:text-teal-400 border border-teal-500/20';
+                default: return 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700';
+            }
+        }
+
+        function highlightSearch(text) {
+            if(!searchQuery) return text;
+            const regex = new RegExp(`(${searchQuery})`, 'gi');
+            return text.replace(regex, '<mark class="bg-sky-500/30 text-sky-900 dark:text-sky-200 px-0.5 rounded">$1</mark>');
+        }
+
+        function handleSearchInput() {
+            applyFilters();
+        }
+
+        function clearSearch() {
+            document.getElementById('searchInput').value = '';
+            applyFilters();
+        }
+
+        function resetAllFilters() {
+            activeCategory = 'all';
+            document.getElementById('searchInput').value = '';
+            document.getElementById('stockFilterSelect').value = 'all';
+            document.getElementById('sortSelect').value = 'qty-desc';
+            renderCategoryTabs();
+            applyFilters();
+        }
+
+        // Reset All Settings & Dashboard Data
+        function resetAllDashboard() {
+            if(confirm("Apakah Anda yakin ingin meriset seluruh pengaturan, tautan OneDrive, filter, dan mengembalikan data stok ke default?")) {
+                localStorage.removeItem('soh_onedrive_url');
+                localStorage.removeItem('soh_theme');
+                document.getElementById('oneDriveUrlInput').value = '';
+                
+                currentSOH = JSON.parse(JSON.stringify(INITIAL_SOH_DATA));
+                dateUpdated = "30-08-2026";
+                timeUpdated = "09:32:25 WIB";
+                
+                resetAllFilters();
+                setThemeMode('system');
+                closeSettingsModal();
+                showToast('Reset Berhasil', 'Dashboard telah dikembalikan ke kondisi awal.');
+            }
+        }
+
+        function setViewMode(mode) {
+            viewMode = mode;
+            const tableBtn = document.getElementById('tableViewBtn');
+            const cardBtn = document.getElementById('cardViewBtn');
+            
+            if(mode === 'table') {
+                tableBtn.className = 'p-1.5 rounded-lg text-xs font-medium text-slate-800 dark:text-white bg-white dark:bg-slate-800 shadow-sm transition';
+                cardBtn.className = 'p-1.5 rounded-lg text-xs font-medium text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white transition';
+            } else {
+                cardBtn.className = 'p-1.5 rounded-lg text-xs font-medium text-slate-800 dark:text-white bg-white dark:bg-slate-800 shadow-sm transition';
+                tableBtn.className = 'p-1.5 rounded-lg text-xs font-medium text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white transition';
+            }
+            applyFilters();
+        }
+
+        function openSettingsModal() {
+            document.getElementById('settingsModal').classList.remove('hidden');
+        }
+
+        function closeSettingsModal() {
+            document.getElementById('settingsModal').classList.add('hidden');
+        }
+
+        function saveOneDriveConfig() {
+            const urlInput = document.getElementById('oneDriveUrlInput').value.trim();
+            if(urlInput) {
+                localStorage.setItem('soh_onedrive_url', urlInput);
+                showToast('OneDrive Tersimpan', 'Link konfigurasi berhasil disimpan.');
+            } else {
+                localStorage.removeItem('soh_onedrive_url');
+                showToast('OneDrive Dihapus', 'Link konfigurasi OneDrive telah dikosongkan.');
+            }
+            closeSettingsModal();
+            triggerManualSync();
+        }
+
+        function loadSavedConfig() {
+            const savedUrl = localStorage.getItem('soh_onedrive_url');
+            if(savedUrl) {
+                document.getElementById('oneDriveUrlInput').value = savedUrl;
+            }
+        }
+
+        function getOneDriveDirectDownloadUrl(rawUrl) {
+            let url = rawUrl.trim();
+            if(!url) return '';
+
+            try {
+                if (!url.startsWith('http://') && !url.startsWith('https://')) {
+                    url = 'https://' + url;
+                }
+                if (url.includes('api.onedrive.com')) return url;
+
+                let encoded = btoa(unescape(encodeURIComponent(url)));
+                let urlSafe = encoded.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+                return `https://api.onedrive.com/v1.0/shares/u!${urlSafe}/root/content`;
+            } catch(e) {
+                console.error("Error converting OneDrive link:", e);
+                return url;
+            }
+        }
+
+        async function triggerManualSync() {
+            const syncIconModal = document.getElementById('syncIconModal');
+            if (syncIconModal) syncIconModal.classList.add('spin-active');
+
+            updateSyncStatus('syncing', 'Syncing...');
+
+            const savedUrl = localStorage.getItem('soh_onedrive_url');
+
+            try {
+                if(savedUrl) {
+                    await fetchAndParseOneDrive(savedUrl);
+                } else {
+                    await new Promise(r => setTimeout(r, 600));
+                    let now = new Date();
+                    timeUpdated = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' }) + " WIB";
+                }
+
+                renderMetrics();
+                renderCategoryTabs();
+                applyFilters();
+                updateSyncStatus('success', 'Synced');
+                showToast('Sync Berhasil!', `Data SOH diperbarui pukul ${timeUpdated}`);
+            } catch (err) {
+                console.warn('Sync info:', err);
+                let now = new Date();
+                timeUpdated = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' }) + " WIB";
+                renderMetrics();
+                renderCategoryTabs();
+                applyFilters();
+                if(savedUrl) {
+                    updateSyncStatus('failed', 'Sync Gagal');
+                    showToast('Sync Gagal', 'Tidak dapat mengambil data dari OneDrive.', 'error');
+                } else {
+                    updateSyncStatus('success', 'Synced');
+                    showToast('Sync Selesai', `Data SOH aktif & diperbarui pukul ${timeUpdated}`);
+                }
+            } finally {
+                if (syncIconModal) syncIconModal.classList.remove('spin-active');
+            }
+        }
+
+        async function fetchAndParseOneDrive(originalUrl) {
+            const graphUrl = getOneDriveDirectDownloadUrl(originalUrl);
+            const cacheBuster = `?cb=${Date.now()}`;
+            
+            const fetchStrategies = [
+                async () => {
+                    const res = await fetch(graphUrl + cacheBuster);
+                    if (!res.ok) throw new Error("Direct Graph API fetch failed");
+                    return await res.arrayBuffer();
+                },
+                async () => {
+                    const res = await fetch(`https://corsproxy.io/?${encodeURIComponent(graphUrl + cacheBuster)}`);
+                    if (!res.ok) throw new Error("Corsproxy failed");
+                    return await res.arrayBuffer();
+                },
+                async () => {
+                    const res = await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(graphUrl + cacheBuster)}`);
+                    if (!res.ok) throw new Error("AllOrigins failed");
+                    return await res.arrayBuffer();
+                },
+                async () => {
+                    let legacyUrl = originalUrl.replace('/redir?', '/download?').replace('/view.aspx?', '/download?');
+                    if (!legacyUrl.includes('download=1')) legacyUrl += (legacyUrl.includes('?') ? '&' : '?') + 'download=1';
+                    const res = await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(legacyUrl + '&cb=' + Date.now())}`);
+                    if (!res.ok) throw new Error("Legacy download failed");
+                    return await res.arrayBuffer();
+                }
+            ];
+
+            let arrayBuffer = null;
+
+            for (const strategy of fetchStrategies) {
+                try {
+                    arrayBuffer = await strategy();
+                    if (arrayBuffer && arrayBuffer.byteLength > 1000) {
+                        break;
+                    }
+                } catch (err) {
+                    console.warn("Proxy strategy failed, trying next...", err);
+                }
+            }
+
+            if (!arrayBuffer || arrayBuffer.byteLength <= 1000) {
+                throw new Error("Gagal mengunduh file dari OneDrive melalui semua jalur.");
+            }
+
+            const workbook = XLSX.read(arrayBuffer, { type: 'array' });
+            let allRows = [];
+            workbook.SheetNames.forEach(sheetName => {
+                let worksheet = workbook.Sheets[sheetName];
+                let rows = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+                allRows = allRows.concat(rows);
+            });
+
+            parseAndApplyRows(allRows);
+        }
+
+        function handleLocalFileUpload(e) {
+            const file = e.target.files[0];
+            if(!file) return;
+
+            updateSyncStatus('syncing', 'Membaca...');
+
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                try {
+                    const data = evt.target.result;
+                    const workbook = XLSX.read(data, { type: 'binary' });
+                    let allRows = [];
+                    workbook.SheetNames.forEach(sheetName => {
+                        let worksheet = workbook.Sheets[sheetName];
+                        let rows = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+                        allRows = allRows.concat(rows);
+                    });
+                    parseAndApplyRows(allRows);
+                    closeSettingsModal();
+                    updateSyncStatus('success', 'Synced');
+                    showToast('File Berhasil Dimuat', `Data dari ${file.name} berhasil diperbarui.`);
+                } catch(err) {
+                    console.error(err);
+                    updateSyncStatus('failed', 'Sync Gagal');
+                    showToast('Error File', 'Gagal membaca file Excel/CSV.', 'error');
+                }
+            };
+            reader.readAsBinaryString(file);
+        }
+
+        function parseAndApplyRows(lines) {
+            let newSOH = {};
+            let foundReportDate = null;
+            let foundReportTime = null;
+
+            lines.forEach((r) => {
+                if (Array.isArray(r)) {
+                    r.forEach((cell, colIdx) => {
+                        if (cell !== null && cell !== undefined) {
+                            let strVal = String(cell).trim();
+                            
+                            if (strVal.toLowerCase().includes('stock position report for')) {
+                                let match = strVal.match(/stock position report for\s*([0-9\-\/A-Za-z]+)/i);
+                                if (match && match[1]) {
+                                    foundReportDate = match[1].trim();
+                                }
+                            }
+
+                            if (strVal === 'Time :' && r[colIdx + 1]) {
+                                let rawT = String(r[colIdx + 1]).trim();
+                                if (rawT) {
+                                    if (rawT.includes('T')) rawT = rawT.split('T')[1];
+                                    foundReportTime = rawT.split('.')[0];
+                                }
+                            }
+                        }
+                    });
+                }
+            });
+
+            if (!foundReportDate) {
+                lines.forEach((r) => {
+                    if (Array.isArray(r)) {
+                        r.forEach((cell, idx) => {
+                            if (String(cell).trim() === 'Date Updated' && r[idx + 1]) {
+                                foundReportDate = String(r[idx + 1]).trim().split('T')[0].split(' ')[0];
+                            }
+                        });
+                    }
+                });
+            }
+
+            if (foundReportDate) dateUpdated = foundReportDate;
+            if (foundReportTime) timeUpdated = foundReportTime + " WIB";
+
+            let catRowIdx = -1;
+            lines.forEach((r, idx) => {
+                if (Array.isArray(r) && r.some(cell => cell !== null && cell !== undefined && (String(cell).includes('iPhone') || String(cell).includes('iPad') || String(cell).includes('Mac')))) {
+                    catRowIdx = idx;
+                }
+            });
+
+            if (catRowIdx !== -1) {
+                let catRow = lines[catRowIdx];
+                let hdrRowIdx = catRowIdx + 2;
+                
+                let categories = [];
+                catRow.forEach((col, idx) => {
+                    if (col && String(col).trim()) categories.push([idx, String(col).trim()]);
+                });
+
+                categories.forEach(([colIdx, cat]) => {
+                    let items = [];
+                    for (let r = hdrRowIdx + 1; r < lines.length; r++) {
+                        let row = lines[r];
+                        if (row && row.length > colIdx + 2) {
+                            let art = row[colIdx] !== undefined && row[colIdx] !== null ? String(row[colIdx]).trim() : '';
+                            let desc = row[colIdx + 1] !== undefined && row[colIdx + 1] !== null ? String(row[colIdx + 1]).trim() : '';
+                            let qtyStr = row[colIdx + 2] !== undefined && row[colIdx + 2] !== null ? String(row[colIdx + 2]).trim() : '';
+                            
+                            if (art && art !== 'Grand Total' && desc && qtyStr !== '') {
+                                let q = parseInt(qtyStr);
+                                if (!isNaN(q)) items.push({ article: art, description: desc, qty: q });
+                            }
+                        }
+                    }
+                    if (items.length > 0) {
+                        newSOH[cat] = { grand_total: items.reduce((s, i) => s + i.qty, 0), items: items };
+                    }
+                });
+
+                if (Object.keys(newSOH).length > 0) {
+                    currentSOH = newSOH;
+                }
+            }
+
+            renderMetrics();
+            renderCategoryTabs();
+            applyFilters();
+        }
+
+        // Auto-Sync Scheduler at 09:00 WIB, 12:00 WIB, and 15:00 WIB
+        function setupAutoSyncScheduler() {
+            setInterval(() => {
+                let now = new Date();
+                let wibHours = (now.getUTCHours() + 7) % 24;
+                let todayStr = now.toISOString().split('T')[0];
+
+                if ([9, 12, 15].includes(wibHours)) {
+                    let lastAutoSyncKey = `last_auto_sync_${todayStr}_${wibHours}`;
+                    if (!localStorage.getItem(lastAutoSyncKey)) {
+                        localStorage.setItem(lastAutoSyncKey, 'true');
+                        console.log(`Triggering ${wibHours}:00 WIB Auto-Sync...`);
+                        triggerManualSync();
+                    }
+                }
+            }, 30000);
+        }
+
+        function showToast(title, message, type = 'success') {
+            const toast = document.getElementById('toastNotification');
+            document.getElementById('toastTitle').textContent = title;
+            document.getElementById('toastMessage').textContent = message;
+
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3500);
+        }
+    </script>
+</body>
+</html>
