@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en" class="antialiased">
+<html lang="id" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SOH Dashboard</title>
+    <title>SOH Stock Checker - Digimap Tunjungan Plaza 3</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script>
@@ -12,147 +12,344 @@
             theme: {
                 extend: {
                     colors: {
-                        apple: { dark: '#1d1d1f', light: '#f5f5f7' }
+                        darkbg: '#0b0f19',
+                        darkcard: '#111827',
+                        darkborder: '#1f2937'
                     }
                 }
             }
         }
     </script>
     <style>
-        /* Smooth transitions */
         body { transition: background-color 0.3s, color 0.3s; }
-        .card { transition: transform 0.2s, box-shadow 0.2s; }
-        .card:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
     </style>
 </head>
-<body class="bg-apple-light text-gray-900 dark:bg-apple-dark dark:text-gray-100 min-h-screen">
+<body class="bg-gray-50 text-gray-900 dark:bg-darkbg dark:text-gray-100 min-h-screen font-sans antialiased">
 
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <!-- Header Section -->
-        <div class="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
-            <div>
-                <h1 class="text-3xl font-bold tracking-tight">Stock On Hand (SOH)</h1>
-                <p id="report-date" class="text-sm text-gray-500 dark:text-gray-400 mt-1 flex items-center gap-2">
-                    <i data-lucide="clock" class="w-4 h-4"></i> Loading date info...
-                </p>
-            </div>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        
+        <!-- Header Top Bar -->
+        <header class="flex flex-col md:flex-row md:items-center justify-between pb-6 border-b border-gray-200 dark:border-darkborder gap-4 mb-6">
             <div class="flex items-center gap-3">
-                <button id="sync-btn" onclick="fetchData()" class="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors text-sm">
-                    <i data-lucide="refresh-cw" class="w-4 h-4" id="sync-icon"></i>
+                <div class="bg-blue-600 p-2.5 rounded-xl text-white shadow-lg shadow-blue-500/20">
+                    <i data-lucide="box" class="w-6 h-6"></i>
+                </div>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <h1 class="text-xl font-bold tracking-tight">Stock On Hand Checker</h1>
+                        <span class="bg-amber-500/10 text-amber-500 border border-amber-500/20 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">BETA</span>
+                        <span id="sync-status-badge" class="bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> SYNC AKTIF
+                        </span>
+                    </div>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5 font-medium">M121 - DIGIMAP TUNJUNGAN PLAZA 3 SURABAYA</p>
+                </div>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-3">
+                <!-- Info Tanggal & Jam Sesuai RAW -->
+                <div class="bg-white dark:bg-darkcard border border-gray-200 dark:border-darkborder px-3 py-1.5 rounded-xl text-xs flex items-center gap-3 shadow-sm">
+                    <div class="flex items-center gap-1.5 text-gray-600 dark:text-gray-300">
+                        <i data-lucide="calendar" class="w-3.5 h-3.5 text-blue-500"></i>
+                        <span>Tanggal XLS Raw: <strong id="txt-date" class="font-semibold">-</strong></span>
+                    </div>
+                    <div class="h-3 w-px bg-gray-200 dark:bg-gray-700"></div>
+                    <div class="flex items-center gap-1.5 text-gray-600 dark:text-gray-300">
+                        <i data-lucide="clock" class="w-3.5 h-3.5 text-blue-500"></i>
+                        <span>Jam RAW: <strong id="txt-time" class="font-semibold">-</strong></span>
+                    </div>
+                </div>
+
+                <!-- Manual Sync & Theme Toggle -->
+                <button onclick="triggerManualSync()" class="bg-white dark:bg-darkcard hover:bg-gray-100 dark:hover:bg-gray-800 border border-gray-200 dark:border-darkborder px-3 py-1.5 rounded-xl text-xs font-medium flex items-center gap-1.5 transition-colors shadow-sm">
+                    <i data-lucide="refresh-cw" id="sync-icon" class="w-3.5 h-3.5 text-blue-500"></i>
                     Manual Sync
                 </button>
-                <button id="theme-toggle" class="p-2 rounded-lg bg-gray-200 dark:bg-gray-800 hover:bg-gray-300 dark:hover:bg-gray-700 transition-colors">
-                    <i data-lucide="sun" id="theme-icon" class="w-5 h-5"></i>
+                <button onclick="toggleTheme()" class="bg-white dark:bg-darkcard hover:bg-gray-100 dark:hover:bg-gray-800 border border-gray-200 dark:border-darkborder p-2 rounded-xl text-xs font-medium transition-colors shadow-sm" title="Ubah Tema">
+                    <i data-lucide="sun" id="theme-icon" class="w-4 h-4 text-amber-500 dark:text-yellow-400"></i>
                 </button>
+            </div>
+        </header>
+
+        <!-- Summary Cards Grid -->
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-6" id="summary-cards">
+            <!-- Injected via JS -->
+        </div>
+
+        <!-- Filter & Category Pills -->
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+            <div class="flex items-center gap-1.5 overflow-x-auto pb-2 md:pb-0 scrollbar-none" id="category-pills">
+                <!-- Injected via JS -->
             </div>
         </div>
 
-        <!-- Dashboard Grid -->
-        <div id="dashboard-container" class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-            <!-- Data will be injected here via JS -->
+        <!-- Search and Sort Controls -->
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-3 mb-6">
+            <div class="relative w-full sm:max-w-md">
+                <i data-lucide="search" class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"></i>
+                <input type="text" id="search-input" oninput="handleSearch()" placeholder="Cari Kode Artikel atau Nama Produk (misal: iPhone 17 Pro, M5, Ultra 3)..." class="w-full bg-white dark:bg-darkcard border border-gray-200 dark:border-darkborder rounded-xl pl-10 pr-4 py-2.5 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all shadow-sm">
+            </div>
+
+            <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
+                <select id="sort-select" onchange="handleSort()" class="bg-white dark:bg-darkcard border border-gray-200 dark:border-darkborder rounded-xl px-3 py-2.5 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm">
+                    <option value="qty-desc">Qty: Tertinggi → Terendah</option>
+                    <option value="qty-asc">Qty: Terendah → Tertinggi</option>
+                    <option value="name-asc">Nama: A → Z</option>
+                </select>
+            </div>
         </div>
+
+        <!-- Counter info -->
+        <div class="flex justify-between items-center text-xs text-gray-500 dark:text-gray-400 mb-3 px-1">
+            <span id="result-count">Menampilkan 0 dari 0 varian produk</span>
+            <span id="total-filtered-qty">Total Qty Terfilter: 0 unit</span>
+        </div>
+
+        <!-- Table Container -->
+        <div class="bg-white dark:bg-darkcard border border-gray-200 dark:border-darkborder rounded-2xl shadow-sm overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="border-b border-gray-200 dark:border-darkborder bg-gray-50/50 dark:bg-darkcard/50 text-[11px] font-semibold uppercase tracking-wider text-gray-400">
+                            <th class="py-3.5 px-4 w-12 text-center">#</th>
+                            <th class="py-3.5 px-4">Kategori</th>
+                            <th class="py-3.5 px-4">SAP Article</th>
+                            <th class="py-3.5 px-4">Deskripsi Produk</th>
+                            <th class="py-3.5 px-4">Status</th>
+                            <th class="py-3.5 px-4 text-right">Jumlah SOH</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-body" class="divide-y divide-gray-100 dark:divide-darkborder text-xs sm:text-sm">
+                        <!-- Rows injected via JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
     </div>
 
     <script>
-        // Initialize Icons
-        lucide.createIcons();
+        let globalData = null;
+        let activeCategory = 'All';
+        let searchQuery = '';
+        let currentSort = 'qty-desc';
 
-        // Theme Toggle Logic (Default to device preference)
-        const themeToggleBtn = document.getElementById('theme-toggle');
-        const themeIcon = document.getElementById('theme-icon');
-        const html = document.documentElement;
+        // Load data on start
+        async function loadData(isManual = false) {
+            const syncIcon = document.getElementById('sync-icon');
+            if (isManual) syncIcon.classList.add('animate-spin');
 
-        function updateThemeIcon() {
+            try {
+                const res = await fetch(`data.json?t=${new Date().getTime()}`);
+                if (!res.ok) throw new Error("Gagal mengambil data.json");
+                globalData = await res.json();
+                
+                // Update header date info
+                document.getElementById('txt-date').innerText = globalData.report_date || '-';
+                document.getElementById('txt-time').innerText = globalData.report_time || '-';
+
+                renderSummaryCards();
+                renderCategoryPills();
+                renderTable();
+
+                if (isManual) {
+                    setTimeout(() => syncIcon.classList.remove('animate-spin'), 600);
+                }
+            } catch (err) {
+                console.error("Error loading data:", err);
+                document.getElementById('sync-status-badge').className = "bg-rose-500/10 text-rose-500 border border-rose-500/20 text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1";
+                document.getElementById('sync-status-badge.innerHTML').innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span> SYNC GAGAL';
+                if (isManual) syncIcon.classList.remove('animate-spin');
+            }
+        }
+
+        function triggerManualSync() {
+            loadData(true);
+        }
+
+        function toggleTheme() {
+            const html = document.documentElement;
+            const themeIcon = document.getElementById('theme-icon');
             if (html.classList.contains('dark')) {
+                html.classList.remove('dark');
+                localStorage.setItem('theme', 'light');
                 themeIcon.setAttribute('data-lucide', 'moon');
             } else {
+                html.classList.add('dark');
+                localStorage.setItem('theme', 'dark');
                 themeIcon.setAttribute('data-lucide', 'sun');
             }
             lucide.createIcons();
         }
 
-        if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-            html.classList.add('dark');
+        // Initialize Theme from localStorage or system
+        if (localStorage.getItem('theme') === 'light') {
+            document.documentElement.classList.remove('dark');
         } else {
-            html.classList.remove('dark');
+            document.documentElement.classList.add('dark');
         }
-        updateThemeIcon();
 
-        themeToggleBtn.addEventListener('click', () => {
-            html.classList.toggle('dark');
-            localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
-            updateThemeIcon();
-        });
-
-        // Fetch Data Logic
-        async function fetchData() {
-            const syncIcon = document.getElementById('sync-icon');
-            const container = document.getElementById('dashboard-container');
-            const dateEl = document.getElementById('report-date');
+        function renderSummaryCards() {
+            const container = document.getElementById('summary-cards');
+            const summaries = globalData.summaries;
             
-            // Spin animation
-            syncIcon.classList.add('animate-spin');
+            // Calculate Total Unit SOH across all items
+            const totalUnits = globalData.items.reduce((sum, item) => sum + item.qty, 0);
+            
+            let html = `
+                <div class="bg-white dark:bg-darkcard border border-gray-200 dark:border-darkborder p-4 rounded-2xl shadow-sm flex flex-col justify-between">
+                    <div class="flex justify-between items-start mb-2">
+                        <span class="text-[11px] font-bold uppercase tracking-wider text-gray-400">Total Unit SOH</span>
+                        <div class="p-1.5 bg-blue-500/10 text-blue-500 rounded-lg"><i data-lucide="package" class="w-4 h-4"></i></div>
+                    </div>
+                    <div>
+                        <div class="text-2xl font-bold tracking-tight">${totalUnits} <span class="text-xs font-normal text-gray-400">unit</span></div>
+                        <p class="text-[11px] text-gray-500 mt-0.5">Seluruh Perangkat Apple</p>
+                    </div>
+                </div>
+            `;
 
-            try {
-                // Fetch with cache busting parameter for manual syncs
-                const res = await fetch(`data.json?t=${new Date().getTime()}`);
-                const data = await res.json();
+            const catIcons = {
+                "iPhone": "smartphone",
+                "iPad": "tablet",
+                "Mac": "laptop",
+                "Apple Watch": "watch",
+                "AirPods": "headphones"
+            };
+
+            for (const [cat, data] of Object.entries(summaries)) {
+                let subtitle = `${data.count_variants} Varian Artikel`;
+                if (cat === "Apple Watch") subtitle = `Watch & AirPods`; // Custom subtitle formatting matching screenshot style if combined or split
                 
-                // Update Date
-                dateEl.innerHTML = `<i data-lucide="clock" class="w-4 h-4"></i> ${data.report_info}`;
-                lucide.createIcons();
-                
-                // Render Categories
-                container.innerHTML = '';
-                for (const [category, items] of Object.entries(data.categories)) {
-                    // Calculate Total
-                    const totalQty = items.reduce((sum, item) => sum + parseInt(item.qty || 0), 0);
-                    
-                    const card = document.createElement('div');
-                    card.className = "card bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden flex flex-col";
-                    
-                    let tableHTML = `
-                        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 flex justify-between items-center">
-                            <h2 class="text-lg font-semibold">${category}</h2>
-                            <span class="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 text-xs font-bold px-2.5 py-1 rounded-full">Total: ${totalQty}</span>
+                html += `
+                    <div class="bg-white dark:bg-darkcard border border-gray-200 dark:border-darkborder p-4 rounded-2xl shadow-sm flex flex-col justify-between cursor-pointer hover:border-blue-500/50 transition-colors" onclick="filterByCategory('${cat}')">
+                        <div class="flex justify-between items-start mb-2">
+                            <span class="text-[11px] font-bold uppercase tracking-wider text-gray-400">${cat.toUpperCase()}</span>
+                            <div class="p-1.5 bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 rounded-lg">
+                                <i data-lucide="${catIcons[cat] || 'box'}" class="w-4 h-4"></i>
+                            </div>
                         </div>
-                        <div class="overflow-x-auto flex-1">
-                            <table class="w-full text-sm text-left">
-                                <thead class="text-xs text-gray-500 dark:text-gray-400 uppercase bg-gray-50 dark:bg-gray-900/50 sticky top-0">
-                                    <tr>
-                                        <th scope="col" class="px-6 py-3">Article</th>
-                                        <th scope="col" class="px-6 py-3">Description</th>
-                                        <th scope="col" class="px-6 py-3 text-right">Qty</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                    `;
+                        <div>
+                            <div class="text-xl font-bold tracking-tight">${data.total_qty} <span class="text-xs font-normal text-gray-400">unit</span></div>
+                            <p class="text-[11px] text-gray-500 mt-0.5">${data.count_variants} Varian Artikel</p>
+                        </div>
+                    </div>
+                `;
+            }
 
-                    items.forEach(item => {
-                        tableHTML += `
-                            <tr class="bg-white dark:bg-gray-800 border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
-                                <td class="px-6 py-3 font-medium whitespace-nowrap text-gray-900 dark:text-gray-300">${item.article}</td>
-                                <td class="px-6 py-3 text-gray-600 dark:text-gray-400">${item.description}</td>
-                                <td class="px-6 py-3 text-right font-semibold">${item.qty}</td>
-                            </tr>
-                        `;
-                    });
+            container.innerHTML = html;
+            lucide.createIcons();
+        }
 
-                    tableHTML += `</tbody></table></div>`;
-                    card.innerHTML = tableHTML;
-                    container.appendChild(card);
+        function renderCategoryPills() {
+            const container = document.getElementById('category-pills');
+            const categories = ['All', ...Object.keys(globalData.summaries)];
+            
+            let html = '';
+            categories.forEach(cat => {
+                const isActive = activeCategory === cat;
+                const count = cat === 'All' ? globalData.items.length : (globalData.summaries[cat]?.count_variants || 0);
+                const label = cat === 'All' ? 'Semua Kategori' : cat;
+                
+                html += `
+                    <button onclick="filterByCategory('${cat}')" class="px-3.5 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all flex items-center gap-2 ${
+                        isActive 
+                            ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20' 
+                            : 'bg-white dark:bg-darkcard border border-gray-200 dark:border-darkborder text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
+                    }">
+                        <span>${label}</span>
+                        <span class="${isActive ? 'bg-blue-700 text-white' : 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400'} px-1.5 py-0.5 rounded-md text-[10px]">${count}</span>
+                    </button>
+                `;
+            });
+
+            container.innerHTML = html;
+        }
+
+        function filterByCategory(cat) {
+            activeCategory = cat;
+            renderCategoryPills();
+            renderTable();
+        }
+
+        function handleSearch() {
+            searchQuery = document.getElementById('search-input').value.toLowerCase();
+            renderTable();
+        }
+
+        function handleSort() {
+            currentSort = document.getElementById('sort-select').value;
+            renderTable();
+        }
+
+        function renderTable() {
+            if (!globalData) return;
+
+            let filtered = globalData.items.filter(item => {
+                const matchCat = activeCategory === 'All' || item.category === activeCategory;
+                const matchQuery = item.article.toLowerCase().includes(searchQuery) || item.description.toLowerCase().includes(searchQuery);
+                return matchCat && matchQuery;
+            });
+
+            // Sorting
+            filtered.sort((a, b) => {
+                if (currentSort === 'qty-desc') return b.qty - a.qty;
+                if (currentSort === 'qty-asc') return a.qty - b.qty;
+                if (currentSort === 'name-asc') return a.description.localeCompare(b.description);
+                return 0;
+            });
+
+            const tbody = document.getElementById('table-body');
+            const totalQtyFiltered = filtered.reduce((sum, item) => sum + item.qty, 0);
+
+            document.getElementById('result-count').innerText = `Menampilkan ${filtered.length} dari ${globalData.items.length} varian produk (${activeCategory === 'All' ? 'Semua Kategori' : activeCategory})`;
+            document.getElementById('total-filtered-qty').innerText = `Total Qty Terfilter: ${totalQtyFiltered} unit`;
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="py-12 text-center text-gray-400">
+                            <div class="flex flex-col items-center justify-center gap-2">
+                                <i data-lucide="search-x" class="w-8 h-8 text-gray-400"></i>
+                                <p>Tidak ada produk yang cocok dengan pencarian kamu.</p>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                lucide.createIcons();
+                return;
+            }
+
+            let html = '';
+            filtered.forEach((item, index) => {
+                // Status logic styling matching screenshot reference
+                let statusBadge = '<span class="px-2.5 py-1 rounded-full text-[11px] font-medium bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">Tersedia</span>';
+                if (item.qty === 0) {
+                    statusBadge = '<span class="px-2.5 py-1 rounded-full text-[11px] font-medium bg-rose-500/10 text-rose-500 border border-rose-500/20">Habis</span>';
+                } else if (item.qty <= 2) {
+                    statusBadge = '<span class="px-2.5 py-1 rounded-full text-[11px] font-medium bg-amber-500/10 text-amber-500 border border-amber-500/20">Menipis</span>';
                 }
 
-            } catch (error) {
-                console.error("Error fetching data:", error);
-                dateEl.innerHTML = `<span class="text-red-500">Failed to sync data.</span>`;
-            } finally {
-                setTimeout(() => syncIcon.classList.remove('animate-spin'), 500);
-            }
+                html += `
+                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-800/40 transition-colors">
+                        <td class="py-3 px-4 text-center font-mono text-gray-400">${index + 1}</td>
+                        <td class="py-3 px-4">
+                            <span class="inline-block bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-900/50 px-2 py-0.5 rounded-lg text-[11px] font-semibold">${item.category}</span>
+                        </td>
+                        <td class="py-3 px-4 font-mono font-medium text-gray-800 dark:text-gray-200">${item.article}</td>
+                        <td class="py-3 px-4 font-medium text-gray-900 dark:text-gray-100">${item.description}</td>
+                        <td class="py-3 px-4">${statusBadge}</td>
+                        <td class="py-3 px-4 text-right font-bold text-sm text-blue-600 dark:text-blue-400">${item.qty}</td>
+                    </tr>
+                `;
+            });
+
+            tbody.innerHTML = html;
+            lucide.createIcons();
         }
 
-        // Initial Load
-        fetchData();
+        // Run initial load
+        loadData();
     </script>
 </body>
 </html>
