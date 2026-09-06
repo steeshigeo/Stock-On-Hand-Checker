@@ -8,7 +8,6 @@ TEMP_FILE = "temp.xlsx"
 
 def fetch_data():
     print("Mendownload file Excel dari OneDrive...")
-    # Menambahkan header User-Agent agar tidak diblokir oleh sistem OneDrive
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
     }
@@ -21,70 +20,57 @@ def fetch_data():
     print("Membaca file Excel...")
     
     try:
-        # Gunakan pd.ExcelFile untuk membaca workbook dan mendata semua sheet
         xls = pd.ExcelFile(TEMP_FILE)
-        print(f"Berhasil membuka Excel. Daftar sheet yang ditemukan: {xls.sheet_names}")
+        print(f"Berhasil membuka Excel. Daftar sheet: {xls.sheet_names}")
     except Exception as e:
-        print(f"Gagal membaca format Excel. Error: {e}")
+        print(f"Gagal membaca format Excel: {e}")
         return
 
-    # Cari nama sheet secara dinamis (mengabaikan typo atau spasi ekstra)
-    raw_sheet_name = next((s for s in xls.sheet_names if "RAW" in s.upper() or "STOCK" in s.upper()), None)
-    soh_sheet_name = next((s for s in xls.sheet_names if "SOH" in s.upper()), None)
+    raw_sheet_name = next((s for s in xls.sheet_names if "RAW" in s.upper() or "STOCK" in s.upper()), xls.sheet_names[0])
+    soh_sheet_name = next((s for s in xls.sheet_names if "SOH" in s.upper()), xls.sheet_names[1] if len(xls.sheet_names) > 1 else xls.sheet_names[0])
 
-    # Fallback jika nama sheet berubah total
-    if not raw_sheet_name:
-        print("Peringatan: Sheet 'RAW' tidak ditemukan. Menggunakan sheet pertama.")
-        raw_sheet_name = xls.sheet_names[0]
-        
-    if not soh_sheet_name:
-        print("Peringatan: Sheet 'SOH' tidak ditemukan. Menggunakan sheet kedua.")
-        soh_sheet_name = xls.sheet_names[1] if len(xls.sheet_names) > 1 else xls.sheet_names[0]
-
-    print(f"=> Menggunakan sheet: '{raw_sheet_name}' untuk Data RAW")
-    print(f"=> Menggunakan sheet: '{soh_sheet_name}' untuk Data SOH")
-
-    # 1. Ambil keterangan Date & Time dari Sheet RAW
+    # 1. Ambil info Tanggal & Jam dari Sheet RAW
     df_raw = pd.read_excel(xls, sheet_name=raw_sheet_name, header=None)
-    
     try:
         report_text = df_raw.iloc[0, 13] if len(df_raw.columns) > 13 else "Stock Position Report"
+        date_text = df_raw.iloc[0, 10] if len(df_raw.columns) > 10 else ""
         time_text = df_raw.iloc[0, 12] if len(df_raw.columns) > 12 else ""
-        report_info = f"{report_text} | Time: {time_text}".strip()
+        report_info = f"{report_text}".strip()
+        raw_date = str(date_text).strip()
+        raw_time = str(time_text).strip()
     except Exception as e:
         report_info = "Stock Position Report"
-        print(f"Peringatan: Gagal mengekstrak tanggal, error: {e}")
+        raw_date = "-"
+        raw_time = "-"
 
-    # 2. Parsing Sheet SOH
+    # 2. Parsing Sheet SOH Berdasarkan Kolom yang Ditemukan
     df_soh = pd.read_excel(xls, sheet_name=soh_sheet_name, header=None)
     
+    # Mapping kategori sesuai struktur Excel aktual: (Col_Article, Col_Desc, Col_Qty)
     categories_map = {
-        "iPhone": (1, 2, 3),        
-        "iPad": (5, 6, 7),          
-        "Mac": (9, 10, 11),         
-        "Apple Watch": (13, 14, 15),
-        "AirPods": (17, 18, 19)     
+        "iPhone": (2, 3, 4),          # C, D, E
+        "iPad": (8, 9, 10),         # I, J, K
+        "Mac": (14, 15, 16),        # O, P, Q
+        "Apple Watch": (20, 21, 22),# U, V, W
+        "AirPods": (26, 27, 28)     # AA, AB, AC
     }
 
-    data = {
-        "report_info": report_info,
-        "categories": {}
-    }
+    all_items = []
+    category_summaries = {}
 
-    start_row = 14
+    start_row = 14 # Baris data mulai setelah header
 
     for cat, (col_art, col_desc, col_qty) in categories_map.items():
-        items = []
+        cat_items = []
         for i in range(start_row, len(df_soh)):
-            # Hindari error jika jumlah kolom sheet kurang dari yang diharapkan
             if len(df_soh.columns) <= col_qty:
-                continue 
+                continue
                 
             article = str(df_soh.iloc[i, col_art]).strip() if pd.notna(df_soh.iloc[i, col_art]) else ""
             desc = str(df_soh.iloc[i, col_desc]).strip() if pd.notna(df_soh.iloc[i, col_desc]) else ""
             qty = df_soh.iloc[i, col_qty]
 
-            if article == "" or article == "nan":
+            if article == "" or article.lower() == "nan" or "grand total" in article.lower():
                 continue
 
             try:
@@ -92,18 +78,32 @@ def fetch_data():
             except:
                 qty = 0
 
-            items.append({
+            item_obj = {
+                "category": cat,
                 "article": article,
                 "description": desc,
                 "qty": qty
-            })
+            }
+            cat_items.append(item_obj)
+            all_items.append(item_obj)
         
-        data["categories"][cat] = items
+        category_summaries[cat] = {
+            "count_variants": len(cat_items),
+            "total_qty": sum(item["qty"] for item in cat_items)
+        }
 
-    with open("data.json", "w") as f:
-        json.dump(data, f, indent=4)
+    data = {
+        "report_date": raw_date,
+        "report_time": raw_time,
+        "report_info": report_info,
+        "summaries": category_summaries,
+        "items": all_items
+    }
+
+    with open("data.json", "w", encoding="utf-8") as f:
+        json.dump(data, f, indent=4, ensure_ascii=False)
         
-    print("Berhasil menyimpan data ke data.json")
+    print("Berhasil memperbarui data.json")
 
     if os.path.exists(TEMP_FILE):
         os.remove(TEMP_FILE)
