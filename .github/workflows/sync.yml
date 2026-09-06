@@ -1,1 +1,35 @@
+name: Auto Sync Data dari OneDrive
 
+on:
+  schedule:
+    - cron: '*/5 * * * *' # Menjalankan skrip setiap 5 menit (berdasarkan UTC)
+  workflow_dispatch: # Mengizinkan sync manual (Triggered dari Tab Actions di GitHub)
+
+jobs:
+  update-data:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # Diperlukan untuk push commit perbaruan data.json ke repo
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install Dependencies
+        run: pip install -r requirements.txt
+
+      - name: Jalankan Script Sync
+        run: python sync.py
+
+      - name: Commit & Push jika ada perubahan
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add data.json
+          git commit -m "Auto-update data.json" || echo "Tidak ada perubahan data"
+          git push
