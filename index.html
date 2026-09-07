@@ -1,355 +1,913 @@
 <!DOCTYPE html>
-<html lang="id" class="dark">
+<html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SOH Stock Checker - Digimap Tunjungan Plaza 3</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        darkbg: '#0b0f19',
-                        darkcard: '#111827',
-                        darkborder: '#1f2937'
-                    }
-                }
-            }
-        }
-    </script>
-    <style>
-        body { transition: background-color 0.3s, color 0.3s; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SOH Local · Digimap TP3</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-a:#eef1f8;
+    --bg-b:#f7eef7;
+    --bg-c:#eef8f4;
+    --surface:rgba(255,255,255,0.62);
+    --surface-solid:#ffffff;
+    --surface-2:rgba(255,255,255,0.4);
+    --border:rgba(0,0,0,0.08);
+    --border-hi:rgba(255,255,255,0.6);
+    --ink:#1d1d1f;
+    --ink-soft:#6e6e73;
+    --ink-faint:#9a9a9e;
+    --brand:#0071e3;
+    --ok:#1c8a43;      --ok-bg:rgba(28,138,67,0.12);
+    --warn:#b06a00;    --warn-bg:rgba(176,106,0,0.13);
+    --bad:#d92d20;     --bad-bg:rgba(217,45,32,0.12);
+    --c-iphone:#0a84ff;
+    --c-ipad:#a44fe0;
+    --c-mac:#d98200;
+    --c-watch:#ff375f;
+    --c-airpods:#0ea89a;
+    --radius-lg:28px;
+    --radius-md:20px;
+    --radius-sm:14px;
+    --shadow-sm:0 1px 2px rgba(0,0,0,0.04), 0 1px 1px rgba(0,0,0,0.03);
+    --shadow-md:0 8px 28px rgba(0,0,0,0.10);
+    --shadow-lg:0 24px 70px rgba(0,0,0,0.22);
+    --blur:22px;
+  }
+  html[data-theme="dark"]{
+    --bg-a:#0e0f14;
+    --bg-b:#161018;
+    --bg-c:#0c1614;
+    --surface:rgba(40,40,44,0.55);
+    --surface-solid:#1c1c1e;
+    --surface-2:rgba(60,60,64,0.4);
+    --border:rgba(255,255,255,0.10);
+    --border-hi:rgba(255,255,255,0.16);
+    --ink:#f5f5f7;
+    --ink-soft:#a1a1a6;
+    --ink-faint:#6e6e73;
+    --ok:#32d74b;       --ok-bg:rgba(50,215,75,0.16);
+    --warn:#ffb340;     --warn-bg:rgba(255,179,64,0.16);
+    --bad:#ff453a;      --bad-bg:rgba(255,69,58,0.16);
+    --shadow-sm:0 1px 2px rgba(0,0,0,0.3);
+    --shadow-md:0 8px 28px rgba(0,0,0,0.45);
+    --shadow-lg:0 24px 70px rgba(0,0,0,0.6);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    color:var(--ink);
+    font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;
+    min-height:100vh;
+    background:
+      radial-gradient(circle at 12% 8%, var(--bg-a) 0%, transparent 45%),
+      radial-gradient(circle at 88% 15%, var(--bg-b) 0%, transparent 42%),
+      radial-gradient(circle at 25% 92%, var(--bg-c) 0%, transparent 45%),
+      radial-gradient(circle at 90% 90%, var(--bg-a) 0%, transparent 40%),
+      var(--bg-a);
+    background-attachment:fixed;
+    transition:background .3s ease, color .3s ease;
+  }
+  a{color:inherit;}
+
+  .glass{
+    background:var(--surface);
+    backdrop-filter:blur(var(--blur)) saturate(180%);
+    -webkit-backdrop-filter:blur(var(--blur)) saturate(180%);
+    border:1px solid var(--border);
+    position:relative;
+  }
+  .glass::before{
+    content:'';
+    position:absolute; inset:0; border-radius:inherit; pointer-events:none;
+    box-shadow:inset 0 1px 0 var(--border-hi);
+    opacity:.6;
+  }
+
+  /* ---------- Header (floating) ---------- */
+  .topbar{
+    position:sticky; top:14px; z-index:30;
+    padding:0 16px;
+  }
+  .topbar-inner{
+    max-width:900px; margin:0 auto; padding:12px 18px;
+    display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+    background:var(--surface);
+    backdrop-filter:blur(26px) saturate(180%);
+    -webkit-backdrop-filter:blur(26px) saturate(180%);
+    border:1px solid var(--border);
+    border-radius:24px;
+    box-shadow:var(--shadow-md);
+  }
+  .headerbtns{display:flex; align-items:center; gap:10px; flex-shrink:0;}
+  .brandmark{display:flex; align-items:center; gap:10px; margin-right:auto;}
+  .brandmark .logo{
+    width:38px;height:38px;border-radius:13px;
+    background:linear-gradient(155deg,#1d1d1f,#3a3a3c);
+    display:flex;align-items:center;justify-content:center;
+    flex-shrink:0; box-shadow:var(--shadow-sm);
+  }
+  .brandmark .logo img{width:19px;height:19px; filter:invert(1) brightness(1.4);}
+  .brandmark .titles{line-height:1.15;}
+  .brandmark .t1{font-weight:700; font-size:15px; letter-spacing:-0.01em;}
+  .brandmark .t2{font-size:12px; color:var(--ink-soft);}
+
+  .sync-status{
+    display:flex; align-items:center; gap:8px;
+    font-size:12.5px; color:var(--ink-soft);
+    background:var(--surface-2); border:1px solid var(--border);
+    padding:7px 12px 7px 10px; border-radius:999px;
+  }
+  .dot{width:8px;height:8px;border-radius:50%;background:var(--ok); position:relative; flex-shrink:0;}
+  .dot.syncing{background:var(--warn);}
+  .dot.error{background:var(--bad);}
+  .dot::after{
+    content:''; position:absolute; inset:-4px; border-radius:50%;
+    border:1.5px solid currentColor; color:var(--ok);
+    opacity:0; animation:pulse 2s ease-out infinite;
+  }
+  .dot.syncing::after{color:var(--warn); animation:pulse 1s ease-out infinite;}
+  .dot.error::after{display:none;}
+  @keyframes pulse{
+    0%{opacity:.55; transform:scale(0.6);}
+    100%{opacity:0; transform:scale(1.8);}
+  }
+  .iconbtn{
+    width:38px;height:38px; border-radius:50%; border:1px solid var(--border);
+    background:var(--surface-2); display:flex; align-items:center; justify-content:center;
+    cursor:pointer; color:var(--ink); transition:.15s; flex-shrink:0;
+  }
+  .iconbtn:hover{background:var(--surface); border-color:var(--border-hi);}
+  .iconbtn:active{transform:scale(0.92);}
+  .iconbtn svg{width:17px;height:17px;}
+  .iconbtn.spin svg{animation:spin .8s linear infinite;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+
+  /* ---------- Layout ---------- */
+  .wrap{max-width:900px; margin:0 auto; padding:12px 20px 20px 20px;}
+
+  .banner{
+    display:flex; align-items:flex-start; gap:12px;
+    border-left:3px solid var(--brand);
+    border-radius:var(--radius-md); padding:14px 16px; margin-bottom:18px;
+    box-shadow:var(--shadow-sm);
+  }
+  .banner .btxt{flex:1; font-size:13.5px; color:var(--ink-soft); line-height:1.5;}
+  .banner .btxt b{color:var(--ink);}
+  .banner button{
+    white-space:nowrap; border:none; background:var(--ink); color:var(--bg-a);
+    padding:9px 16px; border-radius:999px; font-size:13px; font-weight:600; cursor:pointer;
+    font-family:inherit;
+  }
+  html[data-theme="dark"] .banner button{background:#f5f5f7; color:#1d1d1f;}
+
+  .statbar{
+    display:flex; align-items:stretch; border-radius:999px; padding:5px; margin-bottom:18px;
+    box-shadow:var(--shadow-sm);
+  }
+  .statchip{
+    flex:1; display:flex; flex-direction:row; align-items:baseline; justify-content:center; gap:6px;
+    background:transparent; border:2px solid transparent; padding:7px 8px; border-radius:999px; cursor:pointer;
+    font-family:inherit; color:inherit; transition:.15s;
+  }
+  .statchip:hover{background:rgba(128,128,128,0.08);}
+  .statchip:active{border-color:var(--brand);}
+  .statchip.warn:active{border-color:var(--warn);}
+  .statchip.active{background:var(--surface-solid); box-shadow:var(--shadow-sm); border-color:var(--brand);}
+  .statchip.warn.active{border-color:var(--warn);}
+  .statchip .scnum{font-size:16px; font-weight:800; letter-spacing:-0.01em;}
+  .statchip .sclabel{font-size:11px; color:var(--ink-soft); font-weight:600; text-transform:uppercase; letter-spacing:.03em;}
+  .statchip.warn .scnum{color:var(--warn);}
+  .statdiv{width:1px; align-self:center; height:20px; background:var(--border);}
+
+  .controls{
+    display:flex; gap:10px; align-items:center; margin-bottom:16px; flex-wrap:wrap;
+  }
+  .search{
+    flex:1; min-width:200px; position:relative;
+  }
+  .search svg{position:absolute; left:14px; top:50%; transform:translateY(-50%); width:16px; height:16px; color:var(--ink-faint);}
+  .search input{
+    width:100%; padding:12px 14px 12px 40px; border-radius:16px; border:1px solid var(--border);
+    background:var(--surface); font-size:14px; font-family:inherit; color:var(--ink);
+    box-shadow:var(--shadow-sm);
+  }
+  .search input::placeholder{color:var(--ink-faint);}
+  .search input:focus{outline:2px solid var(--brand); outline-offset:1px; border-color:transparent;}
+  select#sortSel{
+    padding:12px 16px; border-radius:16px; border:1px solid var(--border);
+    background:var(--surface); font-size:13.5px; font-family:inherit; color:var(--ink);
+    box-shadow:var(--shadow-sm); cursor:pointer;
+  }
+  select#sortSel option{background:var(--surface-solid); color:var(--ink);}
+
+  .pills{
+    display:flex; gap:8px; overflow-x:auto; padding-bottom:4px; margin-bottom:18px;
+    scrollbar-width:none;
+  }
+  .pills::-webkit-scrollbar{display:none;}
+  .pill{
+    flex-shrink:0; display:flex; align-items:center; gap:7px;
+    padding:9px 15px; border-radius:999px; border:1px solid var(--border);
+    background:var(--surface); font-size:13.5px; font-weight:600; color:var(--ink-soft);
+    cursor:pointer; transition:.15s; white-space:nowrap; font-family:inherit;
+    box-shadow:var(--shadow-sm);
+  }
+  .pill:hover{border-color:var(--border-hi);}
+  .pill .pillicon{width:16px;height:16px; flex-shrink:0; display:flex; color:var(--accent,#8e8e93);}
+  .pill .pillicon svg{width:100%;height:100%;}
+  .pill .ct{font-size:11.5px; padding:1px 6px; border-radius:999px; background:rgba(128,128,128,0.18); color:var(--ink-faint); font-weight:700;}
+  .pill.active{background:var(--ink); color:var(--bg-a); border-color:var(--ink);}
+  html[data-theme="dark"] .pill.active{background:#f5f5f7; color:#1d1d1f;}
+  .pill.active .ct{background:rgba(128,128,128,0.35); color:inherit;}
+  .pill.active .pillicon{color:inherit;}
+
+  /* ---------- List ---------- */
+  .list{
+    display:flex; flex-direction:column; gap:8px;
+  }
+  .row{
+    display:flex; align-items:center; gap:14px;
+    border-radius:var(--radius-md);
+    padding:12px 16px; box-shadow:var(--shadow-sm); transition:.15s;
+    overflow:hidden;
+  }
+  .row:hover{box-shadow:var(--shadow-md);}
+  .row .icon{
+    width:40px; height:40px; border-radius:14px; flex-shrink:0;
+    display:flex; align-items:center; justify-content:center;
+    background:rgba(128,128,128,0.14);
+    color:var(--accent,#888);
+  }
+  .row .icon svg{width:20px; height:20px; stroke:currentColor; display:block;}
+  .row .info{flex:1; min-width:0;}
+  .row .name{font-size:14.5px; font-weight:600; line-height:1.3; overflow-wrap:anywhere;}
+  .row .meta{display:flex; align-items:center; gap:8px; margin-top:3px; flex-wrap:wrap;}
+  .row .cat{font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.04em; color:var(--accent,#888);}
+  .row .code{font-size:11.5px; color:var(--ink-faint); font-family:inherit;}
+  .row .qtycol{font-size:11px; color:var(--ink-faint); font-style:italic;}
+  .stockbadge{
+    display:flex; flex-direction:column; align-items:flex-end; line-height:1; flex-shrink:0;
+  }
+  .stockbadge .n{font-size:20px; font-weight:800;}
+  .stockbadge .s{font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.04em; padding:2px 7px; border-radius:999px; margin-top:4px; white-space:nowrap;}
+  .stockbadge.ok .n{color:var(--ok);} .stockbadge.ok .s{color:var(--ok); background:var(--ok-bg);}
+  .stockbadge.warn .n{color:var(--warn);} .stockbadge.warn .s{color:var(--warn); background:var(--warn-bg);}
+  .stockbadge.bad .n{color:var(--bad);} .stockbadge.bad .s{color:var(--bad); background:var(--bad-bg);}
+
+  .empty{
+    text-align:center; padding:60px 20px; color:var(--ink-soft);
+  }
+  .empty svg{width:44px;height:44px; color:var(--ink-faint); margin-bottom:10px;}
+  .empty .t{font-weight:700; color:var(--ink); margin-bottom:4px; font-size:15px;}
+  .empty .d{font-size:13.5px;}
+  .empty button{
+    margin-top:14px; border:none; background:var(--ink); color:var(--bg-a); padding:9px 16px;
+    border-radius:999px; font-size:13px; font-weight:600; cursor:pointer; font-family:inherit;
+  }
+  html[data-theme="dark"] .empty button{background:#f5f5f7; color:#1d1d1f;}
+
+  .skele{display:flex; flex-direction:column; gap:8px;}
+  .skrow{height:64px; border-radius:var(--radius-md); background:linear-gradient(90deg,rgba(128,128,128,0.12) 25%,rgba(128,128,128,0.2) 37%,rgba(128,128,128,0.12) 63%); background-size:400% 100%; animation:shimmer 1.4s ease infinite;}
+  @keyframes shimmer{0%{background-position:100% 0;}100%{background-position:0 0;}}
+
+  footer{text-align:center; padding:30px 20px 40px; font-size:12px; color:var(--ink-faint);}
+
+  /* ---------- Modal ---------- */
+  .overlay{
+    position:fixed; inset:0; background:rgba(0,0,0,0.35); backdrop-filter:blur(4px);
+    display:none; align-items:center; justify-content:center; z-index:100; padding:16px;
+  }
+  .overlay.show{display:flex;}
+  .modal{
+    background:var(--surface); backdrop-filter:blur(30px) saturate(180%); -webkit-backdrop-filter:blur(30px) saturate(180%);
+    border:1px solid var(--border); border-radius:var(--radius-lg); width:100%; max-width:560px;
+    max-height:88vh; overflow-y:auto; box-shadow:var(--shadow-lg);
+  }
+  .modal-head{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:18px 20px; border-bottom:1px solid var(--border); position:sticky; top:0;
+    background:var(--surface); backdrop-filter:blur(30px);
+  }
+  .modal-head h3{margin:0; font-size:16px; font-weight:700;}
+  .modal-body{padding:20px;}
+  .field{margin-bottom:18px;}
+  .field label{display:block; font-size:13px; font-weight:600; margin-bottom:7px;}
+  .field .hint{font-size:12px; color:var(--ink-soft); margin-top:6px; line-height:1.5;}
+  .field input[type=text], .field input[type=url], .field select{
+    width:100%; padding:12px 14px; border-radius:14px; border:1px solid var(--border);
+    font-size:14px; font-family:inherit; background:var(--surface-2); color:var(--ink);
+  }
+  .field input:focus, .field select:focus{outline:2px solid var(--brand); outline-offset:0; border-color:transparent;}
+  .row2{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
+  .steps{
+    background:var(--surface-2); border:1px solid var(--border); border-radius:var(--radius-sm);
+    padding:14px 16px; font-size:13px; color:var(--ink-soft); line-height:1.7;
+  }
+  .steps b{color:var(--ink);}
+  .steps ol{margin:6px 0 0; padding-left:18px;}
+  .steps code{background:rgba(128,128,128,0.18); padding:1px 5px; border-radius:5px; font-size:12px;}
+  .tabs{display:flex; gap:4px; background:var(--surface-2); padding:4px; border-radius:14px; margin-bottom:16px; flex-wrap:wrap;}
+  .tabs button{
+    flex:1; min-width:70px; border:none; background:transparent; padding:9px 6px; border-radius:10px; font-size:12.5px;
+    font-weight:600; color:var(--ink-soft); cursor:pointer; font-family:inherit;
+  }
+  .tabs button.active{background:var(--surface-solid); color:var(--ink); box-shadow:var(--shadow-sm);}
+  .tabpane{display:none;} .tabpane.active{display:block;}
+  .modal-foot{padding:16px 20px; border-top:1px solid var(--border); display:flex; gap:10px; justify-content:flex-end; position:sticky; bottom:0; background:var(--surface); backdrop-filter:blur(30px);}
+  .btn{
+    padding:10px 20px; border-radius:999px; font-size:13.5px; font-weight:600; cursor:pointer; border:1px solid var(--border);
+    background:var(--surface-2); font-family:inherit; color:var(--ink);
+  }
+  .btn.primary{background:var(--brand); color:#fff; border-color:var(--brand);}
+  .btn.ghost{background:transparent;}
+  .btn.danger{color:var(--bad); border-color:var(--bad);}
+  .filehint{font-size:12px; color:var(--ink-soft); margin-top:8px;}
+  input[type=file]{font-size:13px; width:100%; font-family:inherit; color:var(--ink);}
+
+  /* segmented control for appearance */
+  .seg{
+    display:flex; gap:4px; background:var(--surface-2); padding:4px; border-radius:14px;
+  }
+  .seg button{
+    flex:1; border:none; background:transparent; padding:10px 8px; border-radius:10px; font-size:13px;
+    font-weight:600; color:var(--ink-soft); cursor:pointer; font-family:inherit;
+    display:flex; align-items:center; justify-content:center; gap:6px;
+  }
+  .seg button svg{width:15px;height:15px;}
+  .seg button.active{background:var(--surface-solid); color:var(--ink); box-shadow:var(--shadow-sm);}
+
+  .toast{
+    position:fixed; bottom:20px; left:50%; transform:translateX(-50%) translateY(20px);
+    background:var(--ink); color:var(--bg-a); padding:12px 18px; border-radius:16px; font-size:13.5px;
+    box-shadow:var(--shadow-lg); z-index:200; opacity:0; pointer-events:none; transition:.25s;
+    display:flex; align-items:center; gap:10px; max-width:90vw;
+  }
+  html[data-theme="dark"] .toast{background:#f5f5f7; color:#1d1d1f;}
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0);}
+  .toast.err{background:var(--bad); color:#fff;}
+  .toast.ok{}
+
+  @media(max-width:640px){
+    .statchip{padding:8px 4px;}
+    .statchip .scnum{font-size:14px;}
+    .statchip .sclabel{font-size:9.5px;}
+    .row2{grid-template-columns:1fr;}
+    .banner{flex-direction:column;}
+    .banner button{align-self:flex-start;}
+    .row .code{display:none;}
+    .row .qtycol{display:none;}
+  }
+</style>
 </head>
-<body class="bg-gray-50 text-gray-900 dark:bg-darkbg dark:text-gray-100 min-h-screen font-sans antialiased">
+<body>
 
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        
-        <!-- Header Top Bar -->
-        <header class="flex flex-col md:flex-row md:items-center justify-between pb-6 border-b border-gray-200 dark:border-darkborder gap-4 mb-6">
-            <div class="flex items-center gap-3">
-                <div class="bg-blue-600 p-2.5 rounded-xl text-white shadow-lg shadow-blue-500/20">
-                    <i data-lucide="box" class="w-6 h-6"></i>
-                </div>
-                <div>
-                    <div class="flex items-center gap-2">
-                        <h1 class="text-xl font-bold tracking-tight">Stock On Hand Checker</h1>
-                        <span class="bg-amber-500/10 text-amber-500 border border-amber-500/20 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">BETA</span>
-                        <span id="sync-status-badge" class="bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
-                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> SYNC AKTIF
-                        </span>
-                    </div>
-                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5 font-medium">M121 - DIGIMAP TUNJUNGAN PLAZA 3 SURABAYA</p>
-                </div>
-            </div>
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="brandmark">
+      <div class="logo" id="logoBox">
+        <img src="https://cdn-icons-png.flaticon.com/256/0/747.png" alt="Apple" id="logoImg" onerror="this.style.display='none'; document.getElementById('logoFallback').style.display='block';">
+        <svg id="logoFallback" style="display:none; width:19px;height:19px;" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M16.5 3c.1 1.2-.35 2.35-1.05 3.2-.72.87-1.9 1.55-3.05 1.46-.14-1.15.43-2.36 1.1-3.13C14.24 3.7 15.42 3.05 16.5 3zM20.9 17.3c-.55 1.28-.82 1.85-1.53 2.98-.99 1.56-2.39 3.5-4.12 3.52-1.53.02-1.93-1-4-1-2.08 0-2.52.98-4 1-1.68.03-2.97-1.72-3.96-3.28C.6 17.1-.5 12.15 1.06 8.8c1.1-2.37 2.98-3.75 4.83-3.75 1.5 0 2.4.99 3.98 1 1.53 0 2.14-1 4-1 1.02 0 3.51.35 5.2 2.8-4.7 2.55-3.94 8.86 1.83 9.45z" fill="white"/></svg>
+      </div>
+      <div class="titles">
+        <div class="t1">SOH Local</div>
+        <div class="t2">Digimap Tunjungan Plaza 3</div>
+      </div>
+    </div>
+    <div class="sync-status" id="syncStatus">
+      <span class="dot" id="syncDot"></span>
+      <span id="syncLabel">Belum tersambung</span>
+    </div>
+    <div class="headerbtns">
+    <button class="iconbtn" id="btnTheme" title="Ganti tampilan">
+      <svg id="themeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></svg>
+    </button>
+    <button class="iconbtn" id="btnRefresh" title="Sync sekarang">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg>
+    </button>
+    <button class="iconbtn" id="btnSettings" title="Preferensi">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1.04 1.56V21a2 2 0 0 1-4 0v-.09A1.7 1.7 0 0 0 9 19.4a1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-1.56-1.04H3a2 2 0 0 1 0-4h.09A1.7 1.7 0 0 0 4.6 9a1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1.04-1.56V3a2 2 0 0 1 4 0v.09A1.7 1.7 0 0 0 15 4.6a1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.7 1.7 0 0 0 19.4 9a1.7 1.7 0 0 0 1.56 1.04H21a2 2 0 0 1 0 4h-.09a1.7 1.7 0 0 0-1.51 1.04z"/></svg>
+    </button>
+    </div>
+  </div>
+</div>
 
-            <div class="flex flex-wrap items-center gap-3">
-                <!-- Info Tanggal & Jam Sesuai RAW -->
-                <div class="bg-white dark:bg-darkcard border border-gray-200 dark:border-darkborder px-3 py-1.5 rounded-xl text-xs flex items-center gap-3 shadow-sm">
-                    <div class="flex items-center gap-1.5 text-gray-600 dark:text-gray-300">
-                        <i data-lucide="calendar" class="w-3.5 h-3.5 text-blue-500"></i>
-                        <span>Tanggal XLS Raw: <strong id="txt-date" class="font-semibold">-</strong></span>
-                    </div>
-                    <div class="h-3 w-px bg-gray-200 dark:bg-gray-700"></div>
-                    <div class="flex items-center gap-1.5 text-gray-600 dark:text-gray-300">
-                        <i data-lucide="clock" class="w-3.5 h-3.5 text-blue-500"></i>
-                        <span>Jam RAW: <strong id="txt-time" class="font-semibold">-</strong></span>
-                    </div>
-                </div>
+<div class="wrap">
 
-                <!-- Manual Sync & Theme Toggle -->
-                <button onclick="triggerManualSync()" class="bg-white dark:bg-darkcard hover:bg-gray-100 dark:hover:bg-gray-800 border border-gray-200 dark:border-darkborder px-3 py-1.5 rounded-xl text-xs font-medium flex items-center gap-1.5 transition-colors shadow-sm">
-                    <i data-lucide="refresh-cw" id="sync-icon" class="w-3.5 h-3.5 text-blue-500"></i>
-                    Manual Sync
-                </button>
-                <button onclick="toggleTheme()" class="bg-white dark:bg-darkcard hover:bg-gray-100 dark:hover:bg-gray-800 border border-gray-200 dark:border-darkborder p-2 rounded-xl text-xs font-medium transition-colors shadow-sm" title="Ubah Tema">
-                    <i data-lucide="sun" id="theme-icon" class="w-4 h-4 text-amber-500 dark:text-yellow-400"></i>
-                </button>
-            </div>
-        </header>
+  <div class="statbar glass">
+    <button class="statchip" id="statAllBtn" data-filter="all"><span class="scnum" id="statSku">–</span><span class="sclabel">SKU</span></button>
+    <span class="statdiv"></span>
+    <button class="statchip" id="statUnitBtn" data-filter="all"><span class="scnum" id="statUnit">–</span><span class="sclabel">Unit</span></button>
+    <span class="statdiv"></span>
+    <button class="statchip warn" id="statLowBtn" data-filter="warn"><span class="scnum" id="statLow">–</span><span class="sclabel">Terbatas</span></button>
+  </div>
 
-        <!-- Summary Cards Grid -->
-        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-6" id="summary-cards">
-            <!-- Injected via JS -->
+  <div class="controls">
+    <div class="search">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+      <input type="text" id="searchInput" placeholder="Cari nama produk atau kode SKU...">
+    </div>
+    <select id="sortSel">
+      <option value="name-asc">Nama A–Z</option>
+      <option value="name-desc">Nama Z–A</option>
+      <option value="stock-asc">Stock terendah</option>
+      <option value="stock-desc">Stock terbanyak</option>
+    </select>
+  </div>
+
+  <div class="pills" id="pillRow"></div>
+
+  <div id="skeleton" class="skele" style="display:none;">
+    <div class="skrow"></div><div class="skrow"></div><div class="skrow"></div><div class="skrow"></div><div class="skrow"></div>
+  </div>
+
+  <div class="list" id="list"></div>
+
+  <div class="empty" id="emptyState" style="display:none;">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+    <div class="t">Produk tidak ditemukan</div>
+    <div class="d">Coba kata kunci lain, atau reset filter yang aktif.</div>
+    <button id="btnResetFilter">Reset Filter</button>
+  </div>
+
+  <footer>SOH Local · Digimap Tunjungan Plaza 3 — data disinkronkan dari file stock toko</footer>
+</div>
+
+<!-- Settings Modal -->
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <div class="modal-head">
+      <h3>Preferensi</h3>
+      <button class="iconbtn" id="btnCloseModal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
+    </div>
+    <div class="modal-body">
+
+      <div class="tabs">
+        <button class="tabbtn active" data-tab="pref">Preferensi</button>
+        <button class="tabbtn" data-tab="info">Info Sinkron</button>
+        <button class="tabbtn" data-tab="guide">Cara Kerja</button>
+      </div>
+
+      <div class="tabpane active" data-pane="pref">
+        <div class="field">
+          <label>Tampilan</label>
+          <div class="seg" id="themeSeg">
+            <button data-theme="system"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>Sistem</button>
+            <button data-theme="light"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>Terang</button>
+            <button data-theme="dark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z"/></svg>Gelap</button>
+          </div>
+          <div class="hint">"Sistem" akan otomatis mengikuti pengaturan terang/gelap HP atau laptop kamu.</div>
         </div>
-
-        <!-- Filter & Category Pills -->
-        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-            <div class="flex items-center gap-1.5 overflow-x-auto pb-2 md:pb-0 scrollbar-none" id="category-pills">
-                <!-- Injected via JS -->
-            </div>
+        <div class="field">
+          <label>Ambang batas status "Terbatas"</label>
+          <select id="lowThreshold">
+            <option value="2">≤ 2 unit</option>
+            <option value="3" selected>≤ 3 unit</option>
+            <option value="5">≤ 5 unit</option>
+            <option value="10">≤ 10 unit</option>
+          </select>
+          <div class="hint">Produk dengan stok di bawah/sama dengan angka ini akan ditandai "Terbatas". Selain itu, stok 0 selalu "Habis".</div>
         </div>
-
-        <!-- Search and Sort Controls -->
-        <div class="flex flex-col sm:flex-row items-center justify-between gap-3 mb-6">
-            <div class="relative w-full sm:max-w-md">
-                <i data-lucide="search" class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"></i>
-                <input type="text" id="search-input" oninput="handleSearch()" placeholder="Cari Kode Artikel atau Nama Produk (misal: iPhone 17 Pro, M5, Ultra 3)..." class="w-full bg-white dark:bg-darkcard border border-gray-200 dark:border-darkborder rounded-xl pl-10 pr-4 py-2.5 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all shadow-sm">
-            </div>
-
-            <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
-                <select id="sort-select" onchange="handleSort()" class="bg-white dark:bg-darkcard border border-gray-200 dark:border-darkborder rounded-xl px-3 py-2.5 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm">
-                    <option value="qty-desc">Qty: Tertinggi → Terendah</option>
-                    <option value="qty-asc">Qty: Terendah → Tertinggi</option>
-                    <option value="name-asc">Nama: A → Z</option>
-                </select>
-            </div>
+        <div class="field">
+          <label>Cek pembaruan setiap</label>
+          <select id="refreshInterval">
+            <option value="0.5">30 detik</option>
+            <option value="1">1 menit</option>
+            <option value="2" selected>2 menit</option>
+            <option value="5">5 menit</option>
+          </select>
+          <div class="hint">Aplikasi ini cuma memeriksa file data ringan (data.json) yang sudah disiapkan sistem — jadi aman dicek sesering ini tanpa memberatkan.</div>
         </div>
-
-        <!-- Counter info -->
-        <div class="flex justify-between items-center text-xs text-gray-500 dark:text-gray-400 mb-3 px-1">
-            <span id="result-count">Menampilkan 0 dari 0 varian produk</span>
-            <span id="total-filtered-qty">Total Qty Terfilter: 0 unit</span>
+        <div class="field">
+          <label>Maintenance</label>
+          <button class="btn danger" id="btnResetAll" type="button">Reset Data &amp; Pengaturan Tersimpan</button>
+          <div class="hint">Menghapus cache stock dan preferensi tampilan yang tersimpan di perangkat ini.</div>
         </div>
+      </div>
 
-        <!-- Table Container -->
-        <div class="bg-white dark:bg-darkcard border border-gray-200 dark:border-darkborder rounded-2xl shadow-sm overflow-hidden">
-            <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse">
-                    <thead>
-                        <tr class="border-b border-gray-200 dark:border-darkborder bg-gray-50/50 dark:bg-darkcard/50 text-[11px] font-semibold uppercase tracking-wider text-gray-400">
-                            <th class="py-3.5 px-4 w-12 text-center">#</th>
-                            <th class="py-3.5 px-4">Kategori</th>
-                            <th class="py-3.5 px-4">SAP Article</th>
-                            <th class="py-3.5 px-4">Deskripsi Produk</th>
-                            <th class="py-3.5 px-4">Status</th>
-                            <th class="py-3.5 px-4 text-right">Jumlah SOH</th>
-                        </tr>
-                    </thead>
-                    <tbody id="table-body" class="divide-y divide-gray-100 dark:divide-darkborder text-xs sm:text-sm">
-                        <!-- Rows injected via JS -->
-                    </tbody>
-                </table>
-            </div>
+      <div class="tabpane" data-pane="info">
+        <div class="steps">
+          <b>Sumber data:</b> file Excel di OneDrive toko (<code>stockpositionreportdetail.xls</code>)<br><br>
+          <b>Data per (tanggal di sheet):</b> <span id="infoSourceDate">–</span><br>
+          <b>Terakhir dibangun ulang oleh sistem:</b> <span id="infoGeneratedAt">–</span><br>
+          <b>Terakhir dicek dari HP/laptop ini:</b> <span id="infoLastCheck">–</span>
         </div>
+        <div class="steps" style="margin-top:12px;">
+          Kalau data di sini terasa ketinggalan, cek dulu riwayat run di tab <b>Actions</b> pada repository GitHub proyek ini — di situ kelihatan jelas apakah proses sync terakhir sukses atau gagal, dan kenapa.
+        </div>
+      </div>
+
+      <div class="tabpane" data-pane="guide">
+        <div class="steps">
+          <b>Alur otomatisnya:</b>
+          <ol>
+            <li>Tim edit stok/harga langsung di file Excel <code>stockpositionreportdetail.xls</code> di OneDrive, lalu simpan.</li>
+            <li>GitHub Actions mengecek OneDrive tiap ±2 menit, mengunduh versi terbaru.</li>
+            <li>Data diproses jadi <code>data.json</code> mengikuti mekanisme yang sama dengan sheet <b>SOH</b> di Sales Dashboard toko (kategori DEVICES/ACCESSORIES + sub kategori PHONE/TABLETS/LAPTOPS/WATCH/EARPHONES/HEADPHONES).</li>
+            <li>Kalau ada perubahan, hasilnya di-commit ke repository dan Netlify otomatis publish ulang website ini.</li>
+            <li>Halaman ini sendiri mengecek <code>data.json</code> secara berkala (lihat Preferensi) dan hanya me-refresh tampilan kalau memang ada perubahan.</li>
+          </ol>
+        </div>
+        <div class="steps" style="margin-top:12px;">
+          <b>Catatan penting:</b> ini <i>near real-time</i>, bukan instan sepersekian detik — ada jeda maksimal seukuran interval cek GitHub Actions (~2 menit) ditambah waktu Netlify publish (biasanya beberapa detik). Kalau butuh update paksa segera, buka tab Actions di GitHub lalu klik <b>Run workflow</b>.
+        </div>
+      </div>
 
     </div>
+    <div class="modal-foot">
+      <button class="btn ghost" id="btnCancel">Batal</button>
+      <button class="btn primary" id="btnSaveSettings">Simpan</button>
+    </div>
+  </div>
+</div>
 
-    <script>
-        let globalData = null;
-        let activeCategory = 'All';
-        let searchQuery = '';
-        let currentSort = 'qty-desc';
+<div class="toast" id="toast"></div>
 
-        // Load data on start
-        async function loadData(isManual = false) {
-            const syncIcon = document.getElementById('sync-icon');
-            if (isManual) syncIcon.classList.add('animate-spin');
+<script>
+/* ============================== CONFIG & STATE ============================== */
+const LS_KEY = 'digimap_stock_settings_v4';
+const LS_CACHE = 'digimap_stock_cache_v4';
+const LS_THEME = 'digimap_stock_theme_v4';
 
-            try {
-                const res = await fetch(`data.json?t=${new Date().getTime()}`);
-                if (!res.ok) throw new Error("Gagal mengambil data.json");
-                globalData = await res.json();
-                
-                // Update header date info
-                document.getElementById('txt-date').innerText = globalData.report_date || '-';
-                document.getElementById('txt-time').innerText = globalData.report_time || '-';
+const CATS = {
+  'iPhone':      { color:'var(--c-iphone)',  icon:iconPhone },
+  'iPad':        { color:'var(--c-ipad)',    icon:iconTablet },
+  'Mac':         { color:'var(--c-mac)',     icon:iconLaptop },
+  'Apple Watch': { color:'var(--c-watch)',   icon:iconWatch },
+  'AirPods':     { color:'var(--c-airpods)', icon:iconBuds },
+};
+const CAT_ORDER = ['iPhone','iPad','Mac','Apple Watch','AirPods'];
 
-                renderSummaryCards();
-                renderCategoryPills();
-                renderTable();
+// Data now comes from a pre-built static file (public/data.json) generated by the
+// GitHub Actions pipeline — no client-side OneDrive fetching, no CORS/login issues.
+const DATA_URL = './data.json';
+const savedSettings = loadJSON(LS_KEY, null);
+let settings = savedSettings || {
+  refreshInterval: 2,
+  lowThreshold: 3
+};
 
-                if (isManual) {
-                    setTimeout(() => syncIcon.classList.remove('animate-spin'), 600);
-                }
-            } catch (err) {
-                console.error("Error loading data:", err);
-                document.getElementById('sync-status-badge').className = "bg-rose-500/10 text-rose-500 border border-rose-500/20 text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1";
-                document.getElementById('sync-status-badge.innerHTML').innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span> SYNC GAGAL';
-                if (isManual) syncIcon.classList.remove('animate-spin');
-            }
-        }
+let themePref = loadJSON(LS_THEME, 'system'); // 'system' | 'light' | 'dark'
 
-        function triggerManualSync() {
-            loadData(true);
-        }
+let state = {
+  data: [],
+  activeCat: 'Semua',
+  stockFilter: 'all', // all | warn | bad
+  search: '',
+  sort: 'name-asc',
+  lastSync: null,
+  lastCheck: null,
+  syncStatus: 'idle',
+  sourceDate: null,   // report date embedded in the source sheet itself, if found
+  dataHash: null       // fingerprint used to detect whether the sheet actually changed
+};
 
-        function toggleTheme() {
-            const html = document.documentElement;
-            const themeIcon = document.getElementById('theme-icon');
-            if (html.classList.contains('dark')) {
-                html.classList.remove('dark');
-                localStorage.setItem('theme', 'light');
-                themeIcon.setAttribute('data-lucide', 'moon');
-            } else {
-                html.classList.add('dark');
-                localStorage.setItem('theme', 'dark');
-                themeIcon.setAttribute('data-lucide', 'sun');
-            }
-            lucide.createIcons();
-        }
+let refreshTimer = null;
 
-        // Initialize Theme from localStorage or system
-        if (localStorage.getItem('theme') === 'light') {
-            document.documentElement.classList.remove('dark');
-        } else {
-            document.documentElement.classList.add('dark');
-        }
+/* ============================== SEED / FALLBACK DATA ============================== */
+const SEED_DATA = [{"kategori":"iPad","kode":"APPMD3Y4PA/A","nama":"IPAD 11TH WI-FI 128GB SILVER","stok":19,"baris":19,"qtyKolom":0},{"kategori":"iPad","kode":"APPMD4A4PA/A","nama":"IPAD 11TH WI-FI 128GB BLUE","stok":3,"baris":3,"qtyKolom":0},{"kategori":"iPad","kode":"APPMD4D4PA/A","nama":"IPAD 11TH WI-FI 128GB YELLOW","stok":1,"baris":1,"qtyKolom":0},{"kategori":"iPad","kode":"APPMD4E4PA/A","nama":"IPAD 11TH WI-FI 128GB PINK","stok":12,"baris":12,"qtyKolom":0},{"kategori":"iPad","kode":"APPMD4G4PA/A","nama":"IPAD 11TH WI-FI 256GB SILVER","stok":1,"baris":1,"qtyKolom":0},{"kategori":"iPad","kode":"APPMD4H4PA/A","nama":"IPAD 11TH WI-FI 256GB BLUE","stok":3,"baris":3,"qtyKolom":0},{"kategori":"iPad","kode":"APPMD7F4PA/A","nama":"IPAD 11TH WI-FI + CELLULAR 128GB SILVER","stok":1,"baris":1,"qtyKolom":0},{"kategori":"Mac","kode":"APPMDE14ID/A","nama":"MBP 14 SB/M5/10C/10C GPU/16GB/1TB-IND","stok":4,"baris":4,"qtyKolom":1},{"kategori":"Mac","kode":"APPMDE34ID/A","nama":"MBP 14 SB/M5/10C/10C GPU/24GB/1TB-IND","stok":3,"baris":3,"qtyKolom":0},{"kategori":"Mac","kode":"APPMDH84ID/A","nama":"MBA 13.6 SLV/M5/10C GPU/16GB/1TB-IND","stok":1,"baris":1,"qtyKolom":0},{"kategori":"Mac","kode":"APPMDHF4ID/A","nama":"MBA 13.6 MDN/M5/10C GPU/16GB/1TB-IND","stok":1,"baris":1,"qtyKolom":1},{"kategori":"Mac","kode":"APPMDVK4ID/A","nama":"MBA 15.3 MDN/M5/10C GPU/16GB/1TB-IND","stok":1,"baris":1,"qtyKolom":0},{"kategori":"Mac","kode":"APPMDVQ4ID/A","nama":"MBA 15.3 SKY/M5/10C GPU/16GB/512GB-IND","stok":1,"baris":1,"qtyKolom":0},{"kategori":"iPad","kode":"APPMDWK4PA/A","nama":"IPAD PRO  11-INCH M5 WI-FI 256GB SPACE B","stok":1,"baris":1,"qtyKolom":0},{"kategori":"iPad","kode":"APPMDWM4PA/A","nama":"IPAD PRO  11-INCH M5 WI-FI 512GB SPACE B","stok":1,"baris":1,"qtyKolom":1},{"kategori":"iPad","kode":"APPMDWP4PA/A","nama":"IPAD PRO  11-INCH M5 WI-FI 1TB SPACE BLA","stok":1,"baris":1,"qtyKolom":0},{"kategori":"iPad","kode":"APPME7W4PA/A","nama":"IPAD PRO  13-INCH M5 WI-FI CELL 256GB SP","stok":1,"baris":1,"qtyKolom":1},{"kategori":"iPad","kode":"APPME7Y4PA/A","nama":"IPAD PRO  13-INCH M5 WI-FI CELL 512GB SP","stok":1,"baris":1,"qtyKolom":0},{"kategori":"Apple Watch","kode":"APPMEH34ID/A","nama":"APPLE WATCH SE 3 40 S AL S SB SM GPS-IND","stok":1,"baris":1,"qtyKolom":0},{"kategori":"Apple Watch","kode":"APPMEH94ID/A","nama":"APPLE WATCH SE 3 40 M AL M SB SM GPS-IND","stok":12,"baris":12,"qtyKolom":0},{"kategori":"Apple Watch","kode":"APPMEHJ4ID/A","nama":"APPLE WATCH SE 3 44 S AL S SB ML GPS-IND","stok":2,"baris":2,"qtyKolom":0},{"kategori":"Apple Watch","kode":"APPMEHQ4ID/A","nama":"APPLE WATCH SE 3 44 M AL M SB ML GPS-IND","stok":2,"baris":2,"qtyKolom":0},{"kategori":"Apple Watch","kode":"APPMEU04ID/A","nama":"APPLE WATCH 11 42 RG AL LB SB SM GPS-IND","stok":11,"baris":11,"qtyKolom":0},{"kategori":"Apple Watch","kode":"APPMEUX4ID/A","nama":"APPLE WATCH 11 46 JB AL BK SB ML GPS-IND","stok":4,"baris":4,"qtyKolom":0},{"kategori":"Apple Watch","kode":"APPMEWM4ID/A","nama":"APPLE WATCH ULTRA3 49 NT TI LB ALP M-IND","stok":2,"baris":2,"qtyKolom":0},{"kategori":"Apple Watch","kode":"APPMEWU4ID/A","nama":"APPLE WATCH ULTRA3 49 N T B/BB TL ML-IND","stok":2,"baris":2,"qtyKolom":0},{"kategori":"Apple Watch","kode":"APPMF0J4ID/A","nama":"APPLE WATCH ULTRA3 49 BLACK TI BK OB-IND","stok":3,"baris":3,"qtyKolom":0},{"kategori":"Apple Watch","kode":"APPMF0V4ID/A","nama":"APPLE WATCH ULTRA3 49 BK TI BK ALP M-IND","stok":1,"baris":1,"qtyKolom":0},{"kategori":"Apple Watch","kode":"APPMF1H4ID/A","nama":"APPLE WATCH ULTRA3 49 BK TI BC TL ML-IND","stok":1,"baris":1,"qtyKolom":0},{"kategori":"Apple Watch","kode":"APPMF1Q4ID/A","nama":"APPLE WATCH ULTRA3 49 BK TI BK TML M-IND","stok":2,"baris":2,"qtyKolom":1},{"kategori":"AirPods","kode":"APPMFHP4ID/A","nama":"AIRPODS PRO 3","stok":27,"baris":1,"qtyKolom":27},{"kategori":"iPhone","kode":"APPMFYM4ID/A","nama":"IPHONE 17 PRO MAX 256GB SILVER","stok":31,"baris":31,"qtyKolom":1},{"kategori":"iPhone","kode":"APPMFYN4ID/A","nama":"IPHONE 17 PRO MAX 256GB COSMIC ORANGE","stok":31,"baris":31,"qtyKolom":0},{"kategori":"iPhone","kode":"APPMFYP4ID/A","nama":"IPHONE 17 PRO MAX 256GB DEEP BLUE","stok":16,"baris":16,"qtyKolom":0},{"kategori":"iPhone","kode":"APPMFYQ4ID/A","nama":"IPHONE 17 PRO MAX 512GB SILVER","stok":12,"baris":12,"qtyKolom":0},{"kategori":"iPhone","kode":"APPMFYT4ID/A","nama":"IPHONE 17 PRO MAX 512GB COSMIC ORANGE","stok":7,"baris":7,"qtyKolom":0},{"kategori":"iPhone","kode":"APPMFYV4ID/A","nama":"IPHONE 17 PRO MAX 1TB SILVER","stok":5,"baris":5,"qtyKolom":0},{"kategori":"iPhone","kode":"APPMFYX4ID/A","nama":"IPHONE 17 PRO MAX 1TB DEEP BLUE","stok":1,"baris":1,"qtyKolom":0},{"kategori":"iPhone","kode":"APPMG2L4ID/A","nama":"IPHONE AIR 256GB SPACE BLACK","stok":1,"baris":1,"qtyKolom":0},{"kategori":"iPhone","kode":"APPMG2M4ID/A","nama":"IPHONE AIR 256GB CLOUD WHITE","stok":2,"baris":2,"qtyKolom":0},{"kategori":"iPhone","kode":"APPMG2N4ID/A","nama":"IPHONE AIR 256GB LIGHT GOLD","stok":4,"baris":4,"qtyKolom":0},{"kategori":"iPhone","kode":"APPMG2P4ID/A","nama":"IPHONE AIR 256GB SKY BLUE","stok":5,"baris":5,"qtyKolom":1},{"kategori":"iPhone","kode":"APPMG2T4ID/A","nama":"IPHONE AIR 512GB CLOUD WHITE","stok":1,"baris":1,"qtyKolom":0},{"kategori":"iPhone","kode":"APPMG2U4ID/A","nama":"IPHONE AIR 512GB LIGHT GOLD","stok":1,"baris":1,"qtyKolom":0},{"kategori":"iPhone","kode":"APPMG6J4ID/A","nama":"IPHONE 17 256GB BLACK","stok":9,"baris":9,"qtyKolom":0},{"kategori":"iPhone","kode":"APPMG6K4ID/A","nama":"IPHONE 17 256GB WHITE","stok":20,"baris":20,"qtyKolom":0},{"kategori":"iPhone","kode":"APPMG6L4ID/A","nama":"IPHONE 17 256GB MIST BLUE","stok":2,"baris":2,"qtyKolom":0},{"kategori":"iPhone","kode":"APPMG6M4ID/A","nama":"IPHONE 17 256GB LAVENDER","stok":20,"baris":20,"qtyKolom":0},{"kategori":"iPhone","kode":"APPMG6N4ID/A","nama":"IPHONE 17 256GB SAGE","stok":19,"baris":19,"qtyKolom":0},{"kategori":"iPhone","kode":"APPMG6Q4ID/A","nama":"IPHONE 17 512GB WHITE","stok":1,"baris":1,"qtyKolom":0},{"kategori":"iPhone","kode":"APPMG6V4ID/A","nama":"PHONE 17 512GB SAGE","stok":1,"baris":1,"qtyKolom":0},{"kategori":"iPhone","kode":"APPMG8G4ID/A","nama":"IPHONE 17 PRO 256GB SILVER","stok":13,"baris":13,"qtyKolom":0},{"kategori":"iPhone","kode":"APPMG8H4ID/A","nama":"IPHONE 17 PRO 256GB COSMIC ORANGE","stok":20,"baris":20,"qtyKolom":0},{"kategori":"iPhone","kode":"APPMG8J4ID/A","nama":"IPHONE 17 PRO 256GB DEEP BLUE","stok":84,"baris":84,"qtyKolom":0},{"kategori":"iPhone","kode":"APPMG8K4ID/A","nama":"IPHONE 17 PRO 512GB SILVER","stok":7,"baris":7,"qtyKolom":0},{"kategori":"iPhone","kode":"APPMG8M4ID/A","nama":"IPHONE 17 PRO 512GB COSMIC ORANGE","stok":1,"baris":1,"qtyKolom":0},{"kategori":"iPhone","kode":"APPMG8N4ID/A","nama":"IPHONE 17 PRO 512GB DEEP BLUE","stok":2,"baris":2,"qtyKolom":0},{"kategori":"iPhone","kode":"APPMG8P4ID/A","nama":"IPHONE 17 PRO 1TB SILVER","stok":1,"baris":1,"qtyKolom":0},{"kategori":"iPhone","kode":"APPMG8Q4ID/A","nama":"IPHONE 17 PRO 1TB COSMIC ORANGE","stok":2,"baris":2,"qtyKolom":0},{"kategori":"Mac","kode":"APPMGDN4ID/A","nama":"MBP 14 SL/M5/PRO/15C/16CGPU/24GB/1T-IND","stok":2,"baris":2,"qtyKolom":1},{"kategori":"Mac","kode":"APPMGDP4ID/A","nama":"MBP 14 SL/M5/PRO/18C/20CGPU/24GB/2T-IND","stok":1,"baris":1,"qtyKolom":1},{"kategori":"Mac","kode":"APPMGDQ4ID/A","nama":"MBP 14 SL/M5/MAX/18C/32CGPU/36GB/2T-IND","stok":1,"baris":1,"qtyKolom":1},{"kategori":"Mac","kode":"APPMGE44ID/A","nama":"MBP 16 SL/M5/PRO/18C/20CGPU/24GB/1T-IND","stok":1,"baris":1,"qtyKolom":1},{"kategori":"iPad","kode":"APPMH344PA/A","nama":"IPAD AIR 11 WIFI 128GB PUR M4","stok":1,"baris":1,"qtyKolom":0},{"kategori":"iPad","kode":"APPMH354PA/A","nama":"IPAD AIR 11 WIFI 256GB SPG M4","stok":1,"baris":1,"qtyKolom":0},{"kategori":"iPad","kode":"APPMH364PA/A","nama":"IPAD AIR 11 WIFI 256GB BLU M4","stok":1,"baris":1,"qtyKolom":0},{"kategori":"iPad","kode":"APPMH3G4PA/A","nama":"IPAD AIR 11 WIFI 1TB SPG M4","stok":1,"baris":1,"qtyKolom":1},{"kategori":"iPad","kode":"APPMH5N4PA/A","nama":"IPAD AIR 13 WIFI 128GB SPG M4","stok":1,"baris":1,"qtyKolom":0},{"kategori":"iPad","kode":"APPMH5P4PA/A","nama":"IPAD AIR 13 WIFI 128GB BLU M4","stok":1,"baris":1,"qtyKolom":1},{"kategori":"iPad","kode":"APPMH5W4PA/A","nama":"IPAD AIR 13 WIFI 256GB STL M4","stok":1,"baris":1,"qtyKolom":1},{"kategori":"iPad","kode":"APPMH784PA/A","nama":"IPAD AIR 11 WF CL 128GB SPG M4","stok":1,"baris":1,"qtyKolom":0},{"kategori":"iPad","kode":"APPMH7E4PA/A","nama":"IPAD AIR 11 WF CL 256GB BLU M4","stok":1,"baris":1,"qtyKolom":1},{"kategori":"iPad","kode":"APPMH7F4PA/A","nama":"IPAD AIR 11 WF CL 256GB STL M4","stok":1,"baris":1,"qtyKolom":1},{"kategori":"Mac","kode":"APPMHFA4ID/A","nama":"MBN 13 SLV/8GB/256GB-IND","stok":14,"baris":14,"qtyKolom":0},{"kategori":"Mac","kode":"APPMHFC4ID/A","nama":"MBN 13 SLV/8GB/512GB-IND","stok":8,"baris":8,"qtyKolom":0},{"kategori":"Mac","kode":"APPMHFD4ID/A","nama":"MBN 13 CIT/8GB/256GB-IND","stok":10,"baris":10,"qtyKolom":1},{"kategori":"Mac","kode":"APPMHFE4ID/A","nama":"MBN 13 CIT/8GB/512GB-IND","stok":10,"baris":10,"qtyKolom":0},{"kategori":"Mac","kode":"APPMHFF4ID/A","nama":"MBN 13 IND/8GB/256GB-IND","stok":8,"baris":8,"qtyKolom":0},{"kategori":"Mac","kode":"APPMHFG4ID/A","nama":"MBN 13 IND/8GB/512GB-IND","stok":11,"baris":11,"qtyKolom":0},{"kategori":"Mac","kode":"APPMHFH4ID/A","nama":"MBN 13 BLS/8GB/256GB-IND","stok":3,"baris":3,"qtyKolom":0},{"kategori":"iPhone","kode":"APPMHRV4ID/A","nama":"IPHONE 17E 256GB BLACK","stok":1,"baris":1,"qtyKolom":1},{"kategori":"iPhone","kode":"APPMHRX4ID/A","nama":"IPHONE 17E 256GB SOFT PINK","stok":3,"baris":3,"qtyKolom":0},{"kategori":"iPhone","kode":"APPMHRY4ID/A","nama":"IPHONE 17E 512GB BLACK","stok":1,"baris":1,"qtyKolom":0},{"kategori":"iPhone","kode":"APPMHU04ID/A","nama":"IPHONE 17E 512GB WHITE","stok":1,"baris":1,"qtyKolom":1},{"kategori":"iPhone","kode":"APPMHU34ID/A","nama":"IPHONE 17E 512GB SOFT PINK","stok":1,"baris":1,"qtyKolom":0},{"kategori":"AirPods","kode":"APPMHWK4ID/A","nama":"AIRPODS MAX 2 MIDNIGHT","stok":11,"baris":1,"qtyKolom":11},{"kategori":"AirPods","kode":"APPMHWL4ID/A","nama":"AIRPODS MAX 2 STARLIGHT","stok":3,"baris":1,"qtyKolom":3},{"kategori":"AirPods","kode":"APPMHWM4ID/A","nama":"AIRPODS MAX 2 BLUE","stok":4,"baris":1,"qtyKolom":4},{"kategori":"AirPods","kode":"APPMHWN4ID/A","nama":"AIRPODS MAX 2 ORANGE","stok":1,"baris":1,"qtyKolom":1},{"kategori":"AirPods","kode":"APPMHWP4ID/A","nama":"AIRPODS MAX 2 PURPLE","stok":2,"baris":1,"qtyKolom":2},{"kategori":"Mac","kode":"APPMJLV4ID/A","nama":"MBP 14 SL/M5/PRO/15C/16CGPU/24GB/2T-IND","stok":5,"baris":5,"qtyKolom":1},{"kategori":"Mac","kode":"APPMJLW4ID/A","nama":"MBP 14 SB/M5/PRO/15C/16CGPU/24GB/2T-IND","stok":1,"baris":1,"qtyKolom":1},{"kategori":"iPad","kode":"APPMP263PA/A","nama":"IPAD PRO 12.9 WF CL 2T GRY-PAC 6TH 2022","stok":1,"baris":1,"qtyKolom":1},{"kategori":"iPhone","kode":"APPMPWW3ID/A","nama":"IPHONE 14 512GB MIDNIGHT","stok":1,"baris":1,"qtyKolom":1},{"kategori":"Mac","kode":"APPMR962ID/A","nama":"MBP 15.4/2.2GHZ(I7)/16GB/256GB/TB/SL","stok":1,"baris":1,"qtyKolom":1},{"kategori":"Mac","kode":"APPMRW63ID/A","nama":"MBP 16 SL/M3/12C/18C GP/36G/512G-ID 23","stok":1,"baris":1,"qtyKolom":0},{"kategori":"iPhone","kode":"APPMTP03ID/A","nama":"IPHONE 15 128GB BLACK","stok":3,"baris":3,"qtyKolom":0},{"kategori":"iPhone","kode":"APPMTP13ID/A","nama":"IPHONE 15 128GB PINK","stok":24,"baris":24,"qtyKolom":0},{"kategori":"iPhone","kode":"APPMTP43ID/A","nama":"IPHONE 15 128GB BLUE","stok":13,"baris":13,"qtyKolom":0},{"kategori":"iPhone","kode":"APPMTP63ID/A","nama":"IPHONE 15 256GB BLACK","stok":18,"baris":18,"qtyKolom":0},{"kategori":"iPhone","kode":"APPMTP73ID/A","nama":"IPHONE 15 256GB PINK","stok":6,"baris":6,"qtyKolom":0},{"kategori":"iPhone","kode":"APPMTP93ID/A","nama":"IPHONE 15 256GB BLUE","stok":11,"baris":11,"qtyKolom":0},{"kategori":"iPhone","kode":"APPMU1M3ID/A","nama":"IPHONE 15 PLUS 512GB YELLOW","stok":1,"baris":1,"qtyKolom":1},{"kategori":"AirPods","kode":"APPMWTY3FE/A","nama":"EARPODS WITH LIGHTNING CONNECTOR","stok":11,"baris":1,"qtyKolom":11},{"kategori":"iPad","kode":"APPMXN63PA/A","nama":"IPAD MINI 7 WIFI 128GB  SPACE GREY","stok":2,"baris":2,"qtyKolom":0},{"kategori":"iPad","kode":"APPMXN73PA/A","nama":"IPAD MINI 7 WIFI 128GB  BLUE","stok":2,"baris":2,"qtyKolom":0},{"kategori":"iPad","kode":"APPMXN93PA/A","nama":"IPAD MINI 7 WIFI 128GB  PURPLE","stok":2,"baris":2,"qtyKolom":0},{"kategori":"iPad","kode":"APPMXNC3PA/A","nama":"IPAD MINI 7 WIFI 256GB  BLUE","stok":1,"baris":1,"qtyKolom":0},{"kategori":"AirPods","kode":"APPMXP63ID/A","nama":"AIRPODS 4","stok":1,"baris":1,"qtyKolom":0},{"kategori":"AirPods","kode":"APPMXP93ID/A","nama":"AIRPODS 4 (ACTIVE NOISE CANCELLATION)","stok":14,"baris":1,"qtyKolom":14},{"kategori":"iPhone","kode":"APPMXVU3ID/A","nama":"IPHONE 16 PLUS 128GB BLACK","stok":1,"baris":1,"qtyKolom":0},{"kategori":"iPhone","kode":"APPMXVW3ID/A","nama":"IPHONE 16 PLUS 128GB PINK","stok":1,"baris":1,"qtyKolom":0},{"kategori":"iPhone","kode":"APPMXVX3ID/A","nama":"IPHONE 16 PLUS 128GB ULTRAMARINE","stok":1,"baris":1,"qtyKolom":0},{"kategori":"iPhone","kode":"APPMXVY3ID/A","nama":"IPHONE 16 PLUS 128GB TEAL","stok":1,"baris":1,"qtyKolom":0},{"kategori":"iPhone","kode":"APPMXWV3ID/A","nama":"IPHONE 16 PLUS 256GB WHITE","stok":1,"baris":1,"qtyKolom":0},{"kategori":"iPhone","kode":"APPMXY13ID/A","nama":"IPHONE 16 PLUS 256GB PINK","stok":1,"baris":1,"qtyKolom":0},{"kategori":"iPhone","kode":"APPMXY23ID/A","nama":"IPHONE 16 PLUS 256GB ULTRAMARINE","stok":1,"baris":1,"qtyKolom":0},{"kategori":"iPhone","kode":"APPMXY53ID/A","nama":"IPHONE 16 PLUS 256GB TEAL","stok":1,"baris":1,"qtyKolom":0},{"kategori":"iPhone","kode":"APPMY1P3ID/A","nama":"IPHONE 16 PLUS 512GB BLACK","stok":2,"baris":2,"qtyKolom":1},{"kategori":"iPhone","kode":"APPMY1X3ID/A","nama":"IPHONE 16 PLUS 512GB WHITE","stok":2,"baris":2,"qtyKolom":0},{"kategori":"iPhone","kode":"APPMY253ID/A","nama":"IPHONE 16 PLUS 512GB PINK","stok":2,"baris":2,"qtyKolom":1},{"kategori":"iPhone","kode":"APPMY2D3ID/A","nama":"IPHONE 16 PLUS 512GB ULTRAMARINE","stok":2,"baris":2,"qtyKolom":0},{"kategori":"iPhone","kode":"APPMY2J3ID/A","nama":"IPHONE 16 PLUS 512GB TEAL","stok":2,"baris":2,"qtyKolom":0},{"kategori":"iPhone","kode":"APPMYE73ID/A","nama":"IPHONE 16 128GB BLACK","stok":6,"baris":6,"qtyKolom":0},{"kategori":"iPhone","kode":"APPMYE93ID/A","nama":"IPHONE 16 128GB WHITE","stok":4,"baris":4,"qtyKolom":0},{"kategori":"iPhone","kode":"APPMYEA3ID/A","nama":"IPHONE 16 128GB PINK","stok":11,"baris":11,"qtyKolom":0},{"kategori":"iPhone","kode":"APPMYEC3ID/A","nama":"IPHONE 16 128GB ULTRAMARINE","stok":10,"baris":10,"qtyKolom":0},{"kategori":"iPhone","kode":"APPMYED3ID/A","nama":"IPHONE 16 128GB TEAL","stok":8,"baris":8,"qtyKolom":0},{"kategori":"iPhone","kode":"APPMYER3ID/A","nama":"IPHONE 16 512GB ULTRAMARINE","stok":1,"baris":1,"qtyKolom":0},{"kategori":"iPhone","kode":"APPMYEU3ID/A","nama":"IPHONE 16 512GB TEAL","stok":1,"baris":1,"qtyKolom":0}];
 
-        function renderSummaryCards() {
-            const container = document.getElementById('summary-cards');
-            const summaries = globalData.summaries;
-            
-            // Calculate Total Unit SOH across all items
-            const totalUnits = globalData.items.reduce((sum, item) => sum + item.qty, 0);
-            
-            let html = `
-                <div class="bg-white dark:bg-darkcard border border-gray-200 dark:border-darkborder p-4 rounded-2xl shadow-sm flex flex-col justify-between">
-                    <div class="flex justify-between items-start mb-2">
-                        <span class="text-[11px] font-bold uppercase tracking-wider text-gray-400">Total Unit SOH</span>
-                        <div class="p-1.5 bg-blue-500/10 text-blue-500 rounded-lg"><i data-lucide="package" class="w-4 h-4"></i></div>
-                    </div>
-                    <div>
-                        <div class="text-2xl font-bold tracking-tight">${totalUnits} <span class="text-xs font-normal text-gray-400">unit</span></div>
-                        <p class="text-[11px] text-gray-500 mt-0.5">Seluruh Perangkat Apple</p>
-                    </div>
-                </div>
-            `;
+/* ============================== ICONS ============================== */
+function iconPhone(){return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="2" width="10" height="20" rx="2.5"/><line x1="11" y1="18" x2="13" y2="18"/></svg>`;}
+function iconTablet(){return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2.5"/><line x1="11" y1="18.5" x2="13" y2="18.5"/></svg>`;}
+function iconLaptop(){return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="11" rx="1.5"/><path d="M2 19h20l-1.5-3h-17z"/></svg>`;}
+function iconWatch(){return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="7" width="10" height="10" rx="3"/><path d="M9 7 8.3 3.5h7.4L15 7"/><path d="M9 17l-.7 3.5h7.4L15 17"/></svg>`;}
+function iconBuds(){return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 5c-1.7 0-3 1.3-3 3v5.5a2.5 2.5 0 0 0 5 0V9"/><circle cx="7" cy="6.5" r="2.2"/><path d="M17 5c1.7 0 3 1.3 3 3v5.5a2.5 2.5 0 0 1-5 0V9"/><circle cx="17" cy="6.5" r="2.2"/></svg>`;}
+function iconGrid(){return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>`;}
+const SUN_PATH = `<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>`;
+const MOON_PATH = `<path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z"/>`;
 
-            const catIcons = {
-                "iPhone": "smartphone",
-                "iPad": "tablet",
-                "Mac": "laptop",
-                "Apple Watch": "watch",
-                "AirPods": "headphones"
-            };
+/* ============================== HELPERS ============================== */
+function loadJSON(key, fallback){
+  try{ const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; }catch(e){ return fallback; }
+}
+function saveJSON(key, val){ try{ localStorage.setItem(key, JSON.stringify(val)); }catch(e){} }
+function esc(s){ return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function showToast(msg, type=''){
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = 'toast show ' + type;
+  clearTimeout(showToast._h);
+  showToast._h = setTimeout(()=> t.classList.remove('show'), 3600);
+}
+function timeAgoLabel(){
+  if(!state.lastSync) return 'Belum pernah sync';
+  const diff = Math.floor((Date.now() - state.lastSync)/1000);
+  if(diff < 10) return 'Baru saja';
+  if(diff < 60) return diff + ' detik lalu';
+  if(diff < 3600) return Math.floor(diff/60) + ' menit lalu';
+  return Math.floor(diff/3600) + ' jam lalu';
+}
 
-            for (const [cat, data] of Object.entries(summaries)) {
-                let subtitle = `${data.count_variants} Varian Artikel`;
-                if (cat === "Apple Watch") subtitle = `Watch & AirPods`; // Custom subtitle formatting matching screenshot style if combined or split
-                
-                html += `
-                    <div class="bg-white dark:bg-darkcard border border-gray-200 dark:border-darkborder p-4 rounded-2xl shadow-sm flex flex-col justify-between cursor-pointer hover:border-blue-500/50 transition-colors" onclick="filterByCategory('${cat}')">
-                        <div class="flex justify-between items-start mb-2">
-                            <span class="text-[11px] font-bold uppercase tracking-wider text-gray-400">${cat.toUpperCase()}</span>
-                            <div class="p-1.5 bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 rounded-lg">
-                                <i data-lucide="${catIcons[cat] || 'box'}" class="w-4 h-4"></i>
-                            </div>
-                        </div>
-                        <div>
-                            <div class="text-xl font-bold tracking-tight">${data.total_qty} <span class="text-xs font-normal text-gray-400">unit</span></div>
-                            <p class="text-[11px] text-gray-500 mt-0.5">${data.count_variants} Varian Artikel</p>
-                        </div>
-                    </div>
-                `;
-            }
+/* ============================== THEME ============================== */
+function applyTheme(){
+  const isDark = themePref === 'dark' || (themePref === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+  document.getElementById('themeIcon').innerHTML = isDark ? SUN_PATH : MOON_PATH;
+  document.querySelectorAll('#themeSeg button').forEach(b => b.classList.toggle('active', b.dataset.theme === themePref));
+}
+document.getElementById('btnTheme').addEventListener('click', () => {
+  const isDarkNow = document.documentElement.getAttribute('data-theme') === 'dark';
+  themePref = isDarkNow ? 'light' : 'dark';
+  saveJSON(LS_THEME, themePref);
+  applyTheme();
+});
+document.getElementById('themeSeg').addEventListener('click', e => {
+  const btn = e.target.closest('button[data-theme]');
+  if(!btn) return;
+  themePref = btn.dataset.theme;
+  saveJSON(LS_THEME, themePref);
+  applyTheme();
+});
+if(window.matchMedia){
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+    if(themePref === 'system') applyTheme();
+  });
+}
 
-            container.innerHTML = html;
-            lucide.createIcons();
-        }
+/* ============================== DATA FETCH (static data.json) ============================== */
+function formatReportDate(d){
+  if(!d) return null;
+  try{ return new Date(d).toLocaleDateString('id-ID', { day:'numeric', month:'short', year:'numeric' }); }
+  catch(e){ return null; }
+}
+function formatGeneratedTime(d){
+  if(!d) return null;
+  try{ return new Date(d).toLocaleTimeString('id-ID', { hour:'2-digit', minute:'2-digit' }); }
+  catch(e){ return null; }
+}
+function hashRecords(records){
+  const s = records.map(r => r.kode+':'+r.stok).sort().join('|');
+  let h = 0;
+  for(let i=0;i<s.length;i++){ h = ((h<<5)-h + s.charCodeAt(i))|0; }
+  return h + ':' + records.length;
+}
 
-        function renderCategoryPills() {
-            const container = document.getElementById('category-pills');
-            const categories = ['All', ...Object.keys(globalData.summaries)];
-            
-            let html = '';
-            categories.forEach(cat => {
-                const isActive = activeCategory === cat;
-                const count = cat === 'All' ? globalData.items.length : (globalData.summaries[cat]?.count_variants || 0);
-                const label = cat === 'All' ? 'Semua Kategori' : cat;
-                
-                html += `
-                    <button onclick="filterByCategory('${cat}')" class="px-3.5 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all flex items-center gap-2 ${
-                        isActive 
-                            ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20' 
-                            : 'bg-white dark:bg-darkcard border border-gray-200 dark:border-darkborder text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
-                    }">
-                        <span>${label}</span>
-                        <span class="${isActive ? 'bg-blue-700 text-white' : 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400'} px-1.5 py-0.5 rounded-md text-[10px]">${count}</span>
-                    </button>
-                `;
-            });
+/* ============================== SYNC ORCHESTRATION ============================== */
+// Polls the static data.json (cheap, same-origin, no CORS/login issues at all) and only
+// treats it as an "update" when the sheet's report date or content actually changed —
+// an unchanged file is a silent no-op check. The file itself only changes when the
+// GitHub Actions pipeline detects a real change in the OneDrive source.
+async function doSync(showLoadingState){
+  if(doSync._inFlight) return;
+  doSync._inFlight = true;
+  setSyncUI('syncing');
+  if(showLoadingState) toggleSkeleton(true);
+  try{
+    const res = await fetch(DATA_URL + '?t=' + Date.now(), { cache:'no-store' });
+    if(!res.ok) throw new Error('HTTP ' + res.status);
+    const payload = await res.json();
+    const records = payload.items || [];
+    if(!records.length) throw new Error('data.json kosong');
+    state.lastCheck = Date.now();
+    const newHash = hashRecords(records);
+    const hasReportDate = !!payload.sourceDate;
+    const changed = hasReportDate
+      ? (!state.sourceDate || new Date(payload.sourceDate).getTime() !== new Date(state.sourceDate).getTime())
+      : (state.dataHash !== newHash);
 
-            container.innerHTML = html;
-        }
+    if(changed || !state.lastSync){
+      applyData(records);
+      state.sourceDate = payload.sourceDate || null;
+      state.generatedAt = payload.generatedAt || null;
+      state.dataHash = newHash;
+      state.lastSync = Date.now();
+      saveJSON(LS_CACHE, { data: records, ts: state.lastSync, sourceDate: state.sourceDate, generatedAt: state.generatedAt, hash: newHash });
+      setSyncUI('ok');
+      if(state.lastSync) showToast('Stock berhasil disinkronkan', 'ok');
+    } else {
+      setSyncUI('ok');
+    }
+  }catch(e){
+    console.error(e);
+    const cached = loadJSON(LS_CACHE, null);
+    if(cached){ applyData(cached.data); state.lastSync = cached.ts; state.sourceDate = cached.sourceDate || null; state.generatedAt = cached.generatedAt || null; state.dataHash = cached.hash || null; }
+    else { applyData(SEED_DATA); }
+    setSyncUI('error');
+    showToast('Sync gagal — pakai data tersimpan terakhir', 'err');
+  }finally{
+    doSync._inFlight = false;
+    toggleSkeleton(false);
+    render();
+  }
+}
 
-        function filterByCategory(cat) {
-            activeCategory = cat;
-            renderCategoryPills();
-            renderTable();
-        }
+function applyData(rows){ state.data = rows; }
 
-        function handleSearch() {
-            searchQuery = document.getElementById('search-input').value.toLowerCase();
-            renderTable();
-        }
+function setSyncUI(mode){
+  state.syncStatus = mode;
+  const dot = document.getElementById('syncDot');
+  const label = document.getElementById('syncLabel');
+  dot.className = 'dot';
+  const dateLabel = formatReportDate(state.sourceDate);
+  if(mode === 'syncing'){ dot.classList.add('syncing'); label.textContent = 'Memeriksa data...'; }
+  else if(mode === 'error'){ dot.classList.add('error'); label.textContent = 'Gagal sync · ' + timeAgoLabel(); }
+  else { label.textContent = dateLabel ? ('Data per ' + dateLabel) : ('Tersinkron · ' + timeAgoLabel()); }
+}
 
-        function handleSort() {
-            currentSort = document.getElementById('sort-select').value;
-            renderTable();
-        }
+function toggleSkeleton(show){
+  document.getElementById('skeleton').style.display = show ? 'flex' : 'none';
+  document.getElementById('list').style.display = show ? 'none' : 'flex';
+}
 
-        function renderTable() {
-            if (!globalData) return;
+/* ============================== RENDER ============================== */
+function statusFor(stok){
+  const low = Number(settings.lowThreshold) || 3;
+  if(stok <= 0) return 'bad';
+  if(stok <= low) return 'warn';
+  return 'ok';
+}
+function statusLabel(s){ return s==='bad' ? 'Habis' : s==='warn' ? 'Terbatas' : 'Tersedia'; }
 
-            let filtered = globalData.items.filter(item => {
-                const matchCat = activeCategory === 'All' || item.category === activeCategory;
-                const matchQuery = item.article.toLowerCase().includes(searchQuery) || item.description.toLowerCase().includes(searchQuery);
-                return matchCat && matchQuery;
-            });
+function renderPills(){
+  const row = document.getElementById('pillRow');
+  const counts = {};
+  CAT_ORDER.forEach(c => counts[c]=0);
+  state.data.forEach(d => { counts[d.kategori] = (counts[d.kategori]||0)+1; });
+  const total = state.data.length;
 
-            // Sorting
-            filtered.sort((a, b) => {
-                if (currentSort === 'qty-desc') return b.qty - a.qty;
-                if (currentSort === 'qty-asc') return a.qty - b.qty;
-                if (currentSort === 'name-asc') return a.description.localeCompare(b.description);
-                return 0;
-            });
+  let html = `<div class="pill ${state.activeCat==='Semua'?'active':''}" data-cat="Semua"><span class="pillicon">${iconGrid()}</span>Semua<span class="ct">${total}</span></div>`;
+  CAT_ORDER.forEach(cat => {
+    const c = CATS[cat];
+    html += `<div class="pill ${state.activeCat===cat?'active':''}" data-cat="${cat}" style="--accent:${c.color}">
+      <span class="pillicon">${c.icon()}</span>${cat}<span class="ct">${counts[cat]||0}</span>
+    </div>`;
+  });
+  row.innerHTML = html;
+  row.querySelectorAll('.pill').forEach(p => p.addEventListener('click', () => {
+    state.activeCat = p.dataset.cat; render();
+  }));
+}
 
-            const tbody = document.getElementById('table-body');
-            const totalQtyFiltered = filtered.reduce((sum, item) => sum + item.qty, 0);
+function getFiltered(){
+  let list = state.data.slice();
+  if(state.activeCat !== 'Semua') list = list.filter(d => d.kategori === state.activeCat);
+  if(state.stockFilter !== 'all') list = list.filter(d => statusFor(d.stok) === state.stockFilter);
+  if(state.search.trim()){
+    const q = state.search.trim().toLowerCase();
+    list = list.filter(d => d.nama.toLowerCase().includes(q) || (d.kode||'').toLowerCase().includes(q));
+  }
+  const [key, dir] = state.sort.split('-');
+  list.sort((a,b) => {
+    let va, vb;
+    if(key==='name'){ va=a.nama.toLowerCase(); vb=b.nama.toLowerCase(); return dir==='asc'? va.localeCompare(vb) : vb.localeCompare(va); }
+    if(key==='stock'){ va=a.stok; vb=b.stok; }
+    return dir==='asc' ? va-vb : vb-va;
+  });
+  return list;
+}
 
-            document.getElementById('result-count').innerText = `Menampilkan ${filtered.length} dari ${globalData.items.length} varian produk (${activeCategory === 'All' ? 'Semua Kategori' : activeCategory})`;
-            document.getElementById('total-filtered-qty').innerText = `Total Qty Terfilter: ${totalQtyFiltered} unit`;
+function renderStats(){
+  const total = state.data.length;
+  const units = state.data.reduce((s,d)=>s+ (d.stok||0), 0);
+  const low = state.data.filter(d => statusFor(d.stok)==='warn').length;
+  document.getElementById('statSku').textContent = total;
+  document.getElementById('statUnit').textContent = units.toLocaleString('id-ID');
+  document.getElementById('statLow').textContent = low;
 
-            if (filtered.length === 0) {
-                tbody.innerHTML = `
-                    <tr>
-                        <td colspan="6" class="py-12 text-center text-gray-400">
-                            <div class="flex flex-col items-center justify-center gap-2">
-                                <i data-lucide="search-x" class="w-8 h-8 text-gray-400"></i>
-                                <p>Tidak ada produk yang cocok dengan pencarian kamu.</p>
-                            </div>
-                        </td>
-                    </tr>
-                `;
-                lucide.createIcons();
-                return;
-            }
+  document.getElementById('statAllBtn').classList.toggle('active', state.stockFilter==='all');
+  document.getElementById('statUnitBtn').classList.toggle('active', state.stockFilter==='all');
+  document.getElementById('statLowBtn').classList.toggle('active', state.stockFilter==='warn');
+}
 
-            let html = '';
-            filtered.forEach((item, index) => {
-                // Status logic styling matching screenshot reference
-                let statusBadge = '<span class="px-2.5 py-1 rounded-full text-[11px] font-medium bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">Tersedia</span>';
-                if (item.qty === 0) {
-                    statusBadge = '<span class="px-2.5 py-1 rounded-full text-[11px] font-medium bg-rose-500/10 text-rose-500 border border-rose-500/20">Habis</span>';
-                } else if (item.qty <= 2) {
-                    statusBadge = '<span class="px-2.5 py-1 rounded-full text-[11px] font-medium bg-amber-500/10 text-amber-500 border border-amber-500/20">Menipis</span>';
-                }
+function renderList(){
+  const items = getFiltered();
+  const list = document.getElementById('list');
+  const empty = document.getElementById('emptyState');
+  if(!items.length){ list.innerHTML=''; empty.style.display='block'; list.style.display='none'; return; }
+  empty.style.display='none'; list.style.display='flex';
 
-                html += `
-                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-800/40 transition-colors">
-                        <td class="py-3 px-4 text-center font-mono text-gray-400">${index + 1}</td>
-                        <td class="py-3 px-4">
-                            <span class="inline-block bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-900/50 px-2 py-0.5 rounded-lg text-[11px] font-semibold">${item.category}</span>
-                        </td>
-                        <td class="py-3 px-4 font-mono font-medium text-gray-800 dark:text-gray-200">${item.article}</td>
-                        <td class="py-3 px-4 font-medium text-gray-900 dark:text-gray-100">${item.description}</td>
-                        <td class="py-3 px-4">${statusBadge}</td>
-                        <td class="py-3 px-4 text-right font-bold text-sm text-blue-600 dark:text-blue-400">${item.qty}</td>
-                    </tr>
-                `;
-            });
+  list.innerHTML = items.map(d => {
+    const cat = CATS[d.kategori] || { color:'#888', icon:iconPhone };
+    const st = statusFor(d.stok);
+    const qtyNote = (d.baris!=null && d.qtyKolom!=null && d.baris !== d.qtyKolom) ? `<span class="qtycol">Baris: ${d.baris} · Qty kolom: ${d.qtyKolom}</span>` : '';
+    return `<div class="row glass" style="--accent:${cat.color}">
+      <div class="icon">${cat.icon()}</div>
+      <div class="info">
+        <div class="name">${esc(d.nama)}</div>
+        <div class="meta">
+          <span class="cat">${esc(d.kategori)}</span>
+          <span class="code">${esc(d.kode||'')}</span>
+          ${qtyNote}
+        </div>
+      </div>
+      <div class="stockbadge ${st}">
+        <span class="n">${d.stok}</span>
+        <span class="s">${statusLabel(st)}</span>
+      </div>
+    </div>`;
+  }).join('');
+}
 
-            tbody.innerHTML = html;
-            lucide.createIcons();
-        }
+function render(){
+  renderPills();
+  renderStats();
+  renderList();
+  setSyncUI(state.syncStatus || (state.lastSync ? 'ok' : 'idle'));
+}
 
-        // Run initial load
-        loadData();
-    </script>
+/* ============================== EVENTS ============================== */
+document.getElementById('searchInput').addEventListener('input', e => { state.search = e.target.value; renderList(); });
+document.getElementById('sortSel').addEventListener('change', e => { state.sort = e.target.value; renderList(); });
+
+document.querySelectorAll('.statchip[data-filter]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const f = btn.dataset.filter;
+    state.stockFilter = (state.stockFilter === f) ? 'all' : f;
+    render();
+  });
+});
+
+document.getElementById('btnResetFilter').addEventListener('click', () => {
+  state.activeCat = 'Semua'; state.stockFilter = 'all'; state.search = '';
+  document.getElementById('searchInput').value = '';
+  render();
+});
+
+document.getElementById('btnRefresh').addEventListener('click', () => {
+  const btn = document.getElementById('btnRefresh');
+  btn.classList.add('spin');
+  doSync(false).finally(() => btn.classList.remove('spin'));
+});
+
+const overlay = document.getElementById('overlay');
+function openModal(){
+  document.getElementById('refreshInterval').value = String(settings.refreshInterval);
+  document.getElementById('lowThreshold').value = String(settings.lowThreshold);
+  document.getElementById('infoSourceDate').textContent = formatReportDate(state.sourceDate) || '-';
+  document.getElementById('infoGeneratedAt').textContent = state.generatedAt ? new Date(state.generatedAt).toLocaleString('id-ID') : '-';
+  document.getElementById('infoLastCheck').textContent = state.lastCheck ? new Date(state.lastCheck).toLocaleTimeString('id-ID') : '-';
+  overlay.classList.add('show');
+}
+function closeModal(){ overlay.classList.remove('show'); }
+document.getElementById('btnSettings').addEventListener('click', openModal);
+document.getElementById('btnCloseModal').addEventListener('click', closeModal);
+document.getElementById('btnCancel').addEventListener('click', closeModal);
+overlay.addEventListener('click', e => { if(e.target === overlay) closeModal(); });
+
+document.querySelectorAll('.tabbtn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tabbtn').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.tabpane').forEach(p=>p.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelector(`.tabpane[data-pane="${btn.dataset.tab}"]`).classList.add('active');
+  });
+});
+
+document.getElementById('btnSaveSettings').addEventListener('click', async () => {
+  settings.refreshInterval = Number(document.getElementById('refreshInterval').value);
+  settings.lowThreshold = Number(document.getElementById('lowThreshold').value);
+  saveJSON(LS_KEY, settings);
+  closeModal();
+  scheduleAutoRefresh();
+  render();
+});
+
+document.getElementById('btnResetAll').addEventListener('click', () => {
+  if(!confirm('Yakin mau reset semua data & pengaturan tersimpan di perangkat ini?')) return;
+  localStorage.removeItem(LS_KEY);
+  localStorage.removeItem(LS_CACHE);
+  settings = { refreshInterval:2, lowThreshold:3 };
+  state.data = SEED_DATA; state.lastSync = null; state.sourceDate = null; state.generatedAt = null; state.dataHash = null;
+  closeModal();
+  render();
+  showToast('Data & pengaturan sudah direset', 'ok');
+  doSync(true);
+});
+
+function scheduleAutoRefresh(){
+  if(refreshTimer) clearInterval(refreshTimer);
+  const mins = Number(settings.refreshInterval) || 2;
+  refreshTimer = setInterval(() => doSync(false), mins * 60 * 1000);
+}
+document.addEventListener('visibilitychange', () => {
+  if(document.visibilityState === 'visible'){
+    const stale = !state.lastSync || (Date.now() - state.lastSync) > 60000;
+    if(stale) doSync(false);
+  }
+});
+setInterval(() => { setSyncUI(state.syncStatus || (state.lastSync ? 'ok':'idle')); }, 15000);
+
+/* ============================== INIT ============================== */
+(function init(){
+  applyTheme();
+  const cached = loadJSON(LS_CACHE, null);
+  if(cached && cached.data && cached.data.length){
+    state.data = cached.data;
+    state.lastSync = cached.ts;
+    state.sourceDate = cached.sourceDate || null;
+    state.generatedAt = cached.generatedAt || null;
+    state.dataHash = cached.hash || null;
+    render();
+  } else {
+    state.data = SEED_DATA;
+    render();
+  }
+  scheduleAutoRefresh();
+  doSync(true);
+})();
+</script>
 </body>
 </html>
