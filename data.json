@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-09-10T01:06:31.066896Z",
-  "sourceDate": "2026-09-09T09:37:51",
+  "generatedAt": "2026-09-10T05:55:29.312383Z",
+  "sourceDate": "2026-09-10T09:37:16",
   "items": [
     {
       "kategori": "AirPods",
@@ -14,9 +14,9 @@
       "kategori": "AirPods",
       "kode": "APPMXP93ID/A",
       "nama": "AIRPODS 4 (ACTIVE NOISE CANCELLATION)",
-      "stok": 6,
+      "stok": 5,
       "baris": 1,
-      "qtyKolom": 6
+      "qtyKolom": 5
     },
     {
       "kategori": "AirPods",
@@ -62,17 +62,17 @@
       "kategori": "AirPods",
       "kode": "APPMFHP4ID/A",
       "nama": "AIRPODS PRO 3",
-      "stok": 17,
+      "stok": 16,
       "baris": 1,
-      "qtyKolom": 17
+      "qtyKolom": 16
     },
     {
       "kategori": "AirPods",
       "kode": "APPMYQY3FE/A",
       "nama": "EARPODS (USB-C)-FAE",
-      "stok": 18,
+      "stok": 16,
       "baris": 1,
-      "qtyKolom": 18
+      "qtyKolom": 16
     },
     {
       "kategori": "AirPods",
@@ -102,8 +102,8 @@
       "kategori": "Apple Watch",
       "kode": "APPMEH34ID/A",
       "nama": "APPLE WATCH SE 3 40 S AL S SB SM GPS-IND",
-      "stok": 10,
-      "baris": 10,
+      "stok": 9,
+      "baris": 9,
       "qtyKolom": 0
     },
     {
@@ -188,11 +188,11 @@
     },
     {
       "kategori": "Mac",
-      "kode": "APPMDVD4ID/A",
-      "nama": "MBA 15.3 STL/M5/10C GPU/16GB/512GB-IND",
-      "stok": 1,
-      "baris": 1,
-      "qtyKolom": 1
+      "kode": "APPMHFH4ID/A",
+      "nama": "MBN 13 BLS/8GB/256GB-IND",
+      "stok": 5,
+      "baris": 5,
+      "qtyKolom": 0
     },
     {
       "kategori": "Mac",
@@ -214,8 +214,8 @@
       "kategori": "Mac",
       "kode": "APPMHFF4ID/A",
       "nama": "MBN 13 IND/8GB/256GB-IND",
-      "stok": 6,
-      "baris": 6,
+      "stok": 5,
+      "baris": 5,
       "qtyKolom": 0
     },
     {
@@ -358,8 +358,8 @@
       "kategori": "iPad",
       "kode": "APPMD4H4PA/A",
       "nama": "IPAD 11TH WI-FI 256GB BLUE",
-      "stok": 2,
-      "baris": 2,
+      "stok": 1,
+      "baris": 1,
       "qtyKolom": 0
     },
     {
@@ -420,14 +420,6 @@
     },
     {
       "kategori": "iPad",
-      "kode": "APPMH5W4PA/A",
-      "nama": "IPAD AIR 13 WIFI 256GB STL M4",
-      "stok": 1,
-      "baris": 1,
-      "qtyKolom": 1
-    },
-    {
-      "kategori": "iPad",
       "kode": "APPMXN73PA/A",
       "nama": "IPAD MINI 7 WIFI 128GB  BLUE",
       "stok": 2,
@@ -478,16 +470,16 @@
       "kategori": "iPhone",
       "kode": "APPMTP43ID/A",
       "nama": "IPHONE 15 128GB BLUE",
-      "stok": 8,
-      "baris": 8,
+      "stok": 7,
+      "baris": 7,
       "qtyKolom": 0
     },
     {
       "kategori": "iPhone",
       "kode": "APPMTP13ID/A",
       "nama": "IPHONE 15 128GB PINK",
-      "stok": 15,
-      "baris": 15,
+      "stok": 14,
+      "baris": 14,
       "qtyKolom": 0
     },
     {
@@ -558,8 +550,8 @@
       "kategori": "iPhone",
       "kode": "APPMYE93ID/A",
       "nama": "IPHONE 16 128GB WHITE",
-      "stok": 4,
-      "baris": 4,
+      "stok": 3,
+      "baris": 3,
       "qtyKolom": 0
     },
     {
@@ -694,8 +686,8 @@
       "kategori": "iPhone",
       "kode": "APPMG6K4ID/A",
       "nama": "IPHONE 17 256GB WHITE",
-      "stok": 16,
-      "baris": 16,
+      "stok": 15,
+      "baris": 15,
       "qtyKolom": 0
     },
     {
@@ -718,8 +710,8 @@
       "kategori": "iPhone",
       "kode": "APPMG8J4ID/A",
       "nama": "IPHONE 17 PRO 256GB DEEP BLUE",
-      "stok": 86,
-      "baris": 86,
+      "stok": 85,
+      "baris": 85,
       "qtyKolom": 0
     },
     {
@@ -782,9 +774,9 @@
       "kategori": "iPhone",
       "kode": "APPMFYM4ID/A",
       "nama": "IPHONE 17 PRO MAX 256GB SILVER",
-      "stok": 7,
-      "baris": 7,
-      "qtyKolom": 1
+      "stok": 4,
+      "baris": 4,
+      "qtyKolom": 0
     },
     {
       "kategori": "iPhone",
@@ -798,8 +790,8 @@
       "kategori": "iPhone",
       "kode": "APPMFYQ4ID/A",
       "nama": "IPHONE 17 PRO MAX 512GB SILVER",
-      "stok": 4,
-      "baris": 4,
+      "stok": 3,
+      "baris": 3,
       "qtyKolom": 0
     },
     {
