@@ -1,14 +1,14 @@
 {
-  "generatedAt": "2026-09-16T00:50:02.534012Z",
-  "sourceDate": "2026-09-15T09:42:57",
+  "generatedAt": "2026-09-16T05:22:16.520582Z",
+  "sourceDate": "2026-09-16T09:36:35",
   "items": [
     {
       "kategori": "AirPods",
       "kode": "APPMXP63ID/A",
       "nama": "AIRPODS 4",
-      "stok": 1,
+      "stok": 29,
       "baris": 1,
-      "qtyKolom": 0
+      "qtyKolom": 29
     },
     {
       "kategori": "AirPods",
@@ -62,9 +62,9 @@
       "kategori": "AirPods",
       "kode": "APPMFHP4ID/A",
       "nama": "AIRPODS PRO 3",
-      "stok": 15,
+      "stok": 14,
       "baris": 1,
-      "qtyKolom": 15
+      "qtyKolom": 14
     },
     {
       "kategori": "AirPods",
@@ -102,8 +102,8 @@
       "kategori": "Apple Watch",
       "kode": "APPMEV04ID/A",
       "nama": "APPLE WATCH 11 46 SG AL BK SB SM GPS-IND",
-      "stok": 2,
-      "baris": 2,
+      "stok": 1,
+      "baris": 1,
       "qtyKolom": 0
     },
     {
@@ -160,7 +160,7 @@
       "nama": "APPLE WATCH ULTRA3 49 BLACK TI BK OB-IND",
       "stok": 2,
       "baris": 2,
-      "qtyKolom": 0
+      "qtyKolom": 1
     },
     {
       "kategori": "Apple Watch",
@@ -185,14 +185,6 @@
       "stok": 1,
       "baris": 1,
       "qtyKolom": 1
-    },
-    {
-      "kategori": "Mac",
-      "kode": "APPMDH74ID/A",
-      "nama": "MBA 13.6 SLV/M5/8C GPU/16GB/512GB-IND",
-      "stok": 1,
-      "baris": 1,
-      "qtyKolom": 0
     },
     {
       "kategori": "Mac",
@@ -246,8 +238,8 @@
       "kategori": "Mac",
       "kode": "APPMHFH4ID/A",
       "nama": "MBN 13 BLS/8GB/256GB-IND",
-      "stok": 2,
-      "baris": 2,
+      "stok": 1,
+      "baris": 1,
       "qtyKolom": 0
     },
     {
@@ -620,14 +612,6 @@
     },
     {
       "kategori": "iPhone",
-      "kode": "APPMXVW3ID/A",
-      "nama": "IPHONE 16 PLUS 128GB PINK",
-      "stok": 1,
-      "baris": 1,
-      "qtyKolom": 0
-    },
-    {
-      "kategori": "iPhone",
       "kode": "APPMXVX3ID/A",
       "nama": "IPHONE 16 PLUS 128GB ULTRAMARINE",
       "stok": 1,
@@ -734,8 +718,8 @@
       "kategori": "iPhone",
       "kode": "APPMG8G4ID/A",
       "nama": "IPHONE 17 PRO 256GB SILVER",
-      "stok": 7,
-      "baris": 7,
+      "stok": 6,
+      "baris": 6,
       "qtyKolom": 0
     },
     {
@@ -798,8 +782,8 @@
       "kategori": "iPhone",
       "kode": "APPMFYT4ID/A",
       "nama": "IPHONE 17 PRO MAX 512GB COSMIC ORANGE",
-      "stok": 7,
-      "baris": 7,
+      "stok": 6,
+      "baris": 6,
       "qtyKolom": 0
     },
     {
