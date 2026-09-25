@@ -1,14 +1,14 @@
 {
-  "generatedAt": "2026-09-25T04:44:06.088146Z",
-  "sourceDate": "2026-09-24T18:08:11",
+  "generatedAt": "2026-09-25T09:49:22.008340Z",
+  "sourceDate": "2026-09-25T09:21:12",
   "items": [
     {
       "kategori": "AirPods",
       "kode": "APPMXP63ID/A",
       "nama": "AIRPODS 4",
-      "stok": 28,
+      "stok": 1,
       "baris": 1,
-      "qtyKolom": 28
+      "qtyKolom": 0
     },
     {
       "kategori": "AirPods",
@@ -204,14 +204,6 @@
     },
     {
       "kategori": "Mac",
-      "kode": "APPMDHK4ID/A",
-      "nama": "MBA 13.6 SKY/M5/10C GPU/24GB/1TB-IND",
-      "stok": 1,
-      "baris": 1,
-      "qtyKolom": 0
-    },
-    {
-      "kategori": "Mac",
       "kode": "APPMDHH4ID/A",
       "nama": "MBA 13.6 SKY/M5/8C GPU/16GB/512GB-IND",
       "stok": 3,
@@ -222,8 +214,8 @@
       "kategori": "Mac",
       "kode": "APPMDHA4ID/A",
       "nama": "MBA 13.6 STL/M5/8C GPU/16GB/512GB-IND",
-      "stok": 3,
-      "baris": 3,
+      "stok": 2,
+      "baris": 2,
       "qtyKolom": 0
     },
     {
@@ -398,8 +390,8 @@
       "kategori": "iPad",
       "kode": "APPMD4E4PA/A",
       "nama": "IPAD 11TH WI-FI 128GB PINK",
-      "stok": 10,
-      "baris": 10,
+      "stok": 9,
+      "baris": 9,
       "qtyKolom": 0
     },
     {
@@ -422,14 +414,6 @@
       "kategori": "iPad",
       "kode": "APPMD4H4PA/A",
       "nama": "IPAD 11TH WI-FI 256GB BLUE",
-      "stok": 1,
-      "baris": 1,
-      "qtyKolom": 0
-    },
-    {
-      "kategori": "iPad",
-      "kode": "APPMD4P4PA/A",
-      "nama": "IPAD 11TH WI-FI 256GB PINK",
       "stok": 1,
       "baris": 1,
       "qtyKolom": 0
@@ -776,7 +760,7 @@
       "nama": "IPHONE 17 PRO 256GB COSMIC ORANGE",
       "stok": 12,
       "baris": 12,
-      "qtyKolom": 0
+      "qtyKolom": 1
     },
     {
       "kategori": "iPhone",
@@ -854,8 +838,8 @@
       "kategori": "iPhone",
       "kode": "APPMFYM4ID/A",
       "nama": "IPHONE 17 PRO MAX 256GB SILVER",
-      "stok": 4,
-      "baris": 4,
+      "stok": 2,
+      "baris": 2,
       "qtyKolom": 0
     },
     {
@@ -864,7 +848,7 @@
       "nama": "IPHONE 17 PRO MAX 2TB COSMIC ORANGE",
       "stok": 2,
       "baris": 2,
-      "qtyKolom": 1
+      "qtyKolom": 0
     },
     {
       "kategori": "iPhone",
