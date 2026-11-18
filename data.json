@@ -1,14 +1,38 @@
 {
-  "generatedAt": "2026-11-18T02:28:14.767208Z",
-  "sourceDate": "2026-11-14T09:39:30",
+  "generatedAt": "2026-11-18T10:31:50.479225Z",
+  "sourceDate": "2026-11-18T10:38:57",
   "items": [
     {
       "kategori": "AirPods",
       "kode": "APPMXP63ID/A",
       "nama": "AIRPODS 4",
-      "stok": 3,
+      "stok": 8,
       "baris": 1,
-      "qtyKolom": 3
+      "qtyKolom": 8
+    },
+    {
+      "kategori": "AirPods",
+      "kode": "APPMXP93ID/A",
+      "nama": "AIRPODS 4 (ACTIVE NOISE CANCELLATION)",
+      "stok": 1,
+      "baris": 1,
+      "qtyKolom": 1
+    },
+    {
+      "kategori": "AirPods",
+      "kode": "APPMKFW4ID/A",
+      "nama": "AIRPODS 5",
+      "stok": 13,
+      "baris": 1,
+      "qtyKolom": 13
+    },
+    {
+      "kategori": "AirPods",
+      "kode": "APPMKFT4ID/A",
+      "nama": "AIRPODS 5 (WC)",
+      "stok": 24,
+      "baris": 1,
+      "qtyKolom": 24
     },
     {
       "kategori": "AirPods",
@@ -54,9 +78,9 @@
       "kategori": "AirPods",
       "kode": "APPMFHP4ID/A",
       "nama": "AIRPODS PRO 3",
-      "stok": 19,
+      "stok": 23,
       "baris": 1,
-      "qtyKolom": 19
+      "qtyKolom": 23
     },
     {
       "kategori": "AirPods",
@@ -94,9 +118,9 @@
       "kategori": "AirPods",
       "kode": "APPMYQY3FE/A",
       "nama": "EARPODS (USB-C)-FAE",
-      "stok": 29,
+      "stok": 18,
       "baris": 1,
-      "qtyKolom": 29
+      "qtyKolom": 18
     },
     {
       "kategori": "AirPods",
@@ -132,6 +156,14 @@
     },
     {
       "kategori": "Apple Watch",
+      "kode": "APPMKDC4ID/A",
+      "nama": "APPLE WATCH 12 42 DB AL DB MIL GPS-IND",
+      "stok": 1,
+      "baris": 1,
+      "qtyKolom": 1
+    },
+    {
+      "kategori": "Apple Watch",
       "kode": "APPMJEF4ID/A",
       "nama": "APPLE WATCH 12 42 DB AL OL SB SM GPS-IND",
       "stok": 1,
@@ -164,6 +196,14 @@
     },
     {
       "kategori": "Apple Watch",
+      "kode": "APPMKD84ID/A",
+      "nama": "APPLE WATCH 12 46 DB AL DB MI ML GPS-IND",
+      "stok": 1,
+      "baris": 1,
+      "qtyKolom": 1
+    },
+    {
+      "kategori": "Apple Watch",
       "kode": "APPMJEU4ID/A",
       "nama": "APPLE WATCH 12 46 DB AL OL SB ML GPS-IND",
       "stok": 1,
@@ -174,9 +214,9 @@
       "kategori": "Apple Watch",
       "kode": "APPMJEJ4ID/A",
       "nama": "APPLE WATCH 12 46 SG AL NB SB ML GPS-IND",
-      "stok": 2,
-      "baris": 2,
-      "qtyKolom": 2
+      "stok": 1,
+      "baris": 1,
+      "qtyKolom": 1
     },
     {
       "kategori": "Apple Watch",
@@ -252,14 +292,6 @@
     },
     {
       "kategori": "Apple Watch",
-      "kode": "APPMF0J4ID/A",
-      "nama": "APPLE WATCH ULTRA3 49 BLACK TI BK OB-IND",
-      "stok": 1,
-      "baris": 1,
-      "qtyKolom": 1
-    },
-    {
-      "kategori": "Apple Watch",
       "kode": "APPMEWU4ID/A",
       "nama": "APPLE WATCH ULTRA3 49 N T B/BB TL ML-IND",
       "stok": 2,
@@ -275,6 +307,54 @@
       "qtyKolom": 3
     },
     {
+      "kategori": "Apple Watch",
+      "kode": "APPMJAV4ID/A",
+      "nama": "APPLE WATCH ULTRA4 49 BK TI BK TML M-IND",
+      "stok": 1,
+      "baris": 1,
+      "qtyKolom": 1
+    },
+    {
+      "kategori": "Apple Watch",
+      "kode": "APPMJC44ID/A",
+      "nama": "APPLE WATCH ULTRA4 49 BK TI BR TL ML-IND",
+      "stok": 1,
+      "baris": 1,
+      "qtyKolom": 1
+    },
+    {
+      "kategori": "Apple Watch",
+      "kode": "APPMJC14ID/A",
+      "nama": "APPLE WATCH ULTRA4 49 BK TI BRG AL M-IND",
+      "stok": 2,
+      "baris": 2,
+      "qtyKolom": 2
+    },
+    {
+      "kategori": "Apple Watch",
+      "kode": "APPMJAY4ID/A",
+      "nama": "APPLE WATCH ULTRA4 49 BK TI TRN B OB-IND",
+      "stok": 2,
+      "baris": 2,
+      "qtyKolom": 2
+    },
+    {
+      "kategori": "Apple Watch",
+      "kode": "APPMJAF4ID/A",
+      "nama": "APPLE WATCH ULTRA4 49 NT TI DSR AL M-IND",
+      "stok": 1,
+      "baris": 1,
+      "qtyKolom": 1
+    },
+    {
+      "kategori": "Apple Watch",
+      "kode": "APPMJAD4ID/A",
+      "nama": "APPLE WATCH ULTRA4 49 NT TI TRN G OB-IND",
+      "stok": 1,
+      "baris": 1,
+      "qtyKolom": 1
+    },
+    {
       "kategori": "Mac",
       "kode": "APPMDHF4ID/A",
       "nama": "MBA 13.6 MDN/M5/10C GPU/16GB/1TB-IND",
@@ -286,9 +366,9 @@
       "kategori": "Mac",
       "kode": "APPMDHJ4ID/A",
       "nama": "MBA 13.6 SKY/M5/10C GPU/16GB/1TB-IND",
-      "stok": 3,
-      "baris": 3,
-      "qtyKolom": 3
+      "stok": 2,
+      "baris": 2,
+      "qtyKolom": 2
     },
     {
       "kategori": "Mac",
@@ -342,9 +422,9 @@
       "kategori": "Mac",
       "kode": "APPMDE34ID/A",
       "nama": "MBP 14 SB/M5/10C/10C GPU/24GB/1TB-IND",
-      "stok": 2,
-      "baris": 2,
-      "qtyKolom": 2
+      "stok": 1,
+      "baris": 1,
+      "qtyKolom": 1
     },
     {
       "kategori": "Mac",
@@ -412,6 +492,14 @@
     },
     {
       "kategori": "iPad",
+      "kode": "APPMD4A4PA/A",
+      "nama": "IPAD 11TH WI-FI 128GB BLUE",
+      "stok": 1,
+      "baris": 1,
+      "qtyKolom": 1
+    },
+    {
+      "kategori": "iPad",
       "kode": "APPMD4E4PA/A",
       "nama": "IPAD 11TH WI-FI 128GB PINK",
       "stok": 3,
@@ -422,17 +510,9 @@
       "kategori": "iPad",
       "kode": "APPMD3Y4PA/A",
       "nama": "IPAD 11TH WI-FI 128GB SILVER",
-      "stok": 6,
-      "baris": 6,
-      "qtyKolom": 6
-    },
-    {
-      "kategori": "iPad",
-      "kode": "APPMD4P4PA/A",
-      "nama": "IPAD 11TH WI-FI 256GB PINK",
-      "stok": 1,
-      "baris": 1,
-      "qtyKolom": 1
+      "stok": 13,
+      "baris": 13,
+      "qtyKolom": 13
     },
     {
       "kategori": "iPad",
@@ -446,14 +526,6 @@
       "kategori": "iPad",
       "kode": "APPMH344PA/A",
       "nama": "IPAD AIR 11 WIFI 128GB PUR M4",
-      "stok": 1,
-      "baris": 1,
-      "qtyKolom": 1
-    },
-    {
-      "kategori": "iPad",
-      "kode": "APPMH334PA/A",
-      "nama": "IPAD AIR 11 WIFI 128GB STL M4",
       "stok": 1,
       "baris": 1,
       "qtyKolom": 1
@@ -484,14 +556,6 @@
     },
     {
       "kategori": "iPad",
-      "kode": "APPMH5Q4PA/A",
-      "nama": "IPAD AIR 13 WIFI 128GB STL M4",
-      "stok": 1,
-      "baris": 1,
-      "qtyKolom": 1
-    },
-    {
-      "kategori": "iPad",
       "kode": "APPMH5W4PA/A",
       "nama": "IPAD AIR 13 WIFI 256GB STL M4",
       "stok": 1,
@@ -510,22 +574,14 @@
       "kategori": "iPad",
       "kode": "APPMDYJ4PA/A",
       "nama": "IPAD PRO  13-INCH M5 WI-FI 256GB SPACE B",
-      "stok": 2,
-      "baris": 2,
-      "qtyKolom": 2
-    },
-    {
-      "kategori": "iPad",
-      "kode": "APPMDYL4PA/A",
-      "nama": "IPAD PRO  13-INCH M5 WI-FI 512GB SPACE B",
       "stok": 1,
       "baris": 1,
       "qtyKolom": 1
     },
     {
       "kategori": "iPad",
-      "kode": "APPME8F4PA/A",
-      "nama": "IPAD PRO  13-INCH M5 WI-FI CELL 1TB SILV",
+      "kode": "APPMDYL4PA/A",
+      "nama": "IPAD PRO  13-INCH M5 WI-FI 512GB SPACE B",
       "stok": 1,
       "baris": 1,
       "qtyKolom": 1
@@ -590,9 +646,9 @@
       "kategori": "iPhone",
       "kode": "APPMTP63ID/A",
       "nama": "IPHONE 15 256GB BLACK",
-      "stok": 11,
-      "baris": 11,
-      "qtyKolom": 11
+      "stok": 9,
+      "baris": 9,
+      "qtyKolom": 9
     },
     {
       "kategori": "iPhone",
@@ -638,9 +694,9 @@
       "kategori": "iPhone",
       "kode": "APPMYEC3ID/A",
       "nama": "IPHONE 16 128GB ULTRAMARINE",
-      "stok": 6,
-      "baris": 6,
-      "qtyKolom": 6
+      "stok": 5,
+      "baris": 5,
+      "qtyKolom": 5
     },
     {
       "kategori": "iPhone",
@@ -702,9 +758,9 @@
       "kategori": "iPhone",
       "kode": "APPMG6M4ID/A",
       "nama": "IPHONE 17 256GB LAVENDER",
-      "stok": 25,
-      "baris": 25,
-      "qtyKolom": 25
+      "stok": 24,
+      "baris": 24,
+      "qtyKolom": 24
     },
     {
       "kategori": "iPhone",
@@ -740,14 +796,6 @@
     },
     {
       "kategori": "iPhone",
-      "kode": "APPMG6U4ID/A",
-      "nama": "IPHONE 17 512GB LAVENDER",
-      "stok": 1,
-      "baris": 1,
-      "qtyKolom": 1
-    },
-    {
-      "kategori": "iPhone",
       "kode": "APPMG6V4ID/A",
       "nama": "IPHONE 17 512GB SAGE",
       "stok": 1,
@@ -772,14 +820,6 @@
     },
     {
       "kategori": "iPhone",
-      "kode": "APPMG8R4ID/A",
-      "nama": "IPHONE 17 PRO 1TB DEEP BLUE",
-      "stok": 1,
-      "baris": 1,
-      "qtyKolom": 1
-    },
-    {
-      "kategori": "iPhone",
       "kode": "APPMG8P4ID/A",
       "nama": "IPHONE 17 PRO 1TB SILVER",
       "stok": 1,
@@ -790,9 +830,9 @@
       "kategori": "iPhone",
       "kode": "APPMG8J4ID/A",
       "nama": "IPHONE 17 PRO 256GB DEEP BLUE",
-      "stok": 35,
-      "baris": 35,
-      "qtyKolom": 35
+      "stok": 29,
+      "baris": 29,
+      "qtyKolom": 29
     },
     {
       "kategori": "iPhone",
@@ -809,14 +849,6 @@
       "stok": 2,
       "baris": 2,
       "qtyKolom": 2
-    },
-    {
-      "kategori": "iPhone",
-      "kode": "APPMFYX4ID/A",
-      "nama": "IPHONE 17 PRO MAX 1TB DEEP BLUE",
-      "stok": 1,
-      "baris": 1,
-      "qtyKolom": 1
     },
     {
       "kategori": "iPhone",
@@ -846,9 +878,9 @@
       "kategori": "iPhone",
       "kode": "APPMFYT4ID/A",
       "nama": "IPHONE 17 PRO MAX 512GB COSMIC ORANGE",
-      "stok": 4,
-      "baris": 4,
-      "qtyKolom": 4
+      "stok": 3,
+      "baris": 3,
+      "qtyKolom": 3
     },
     {
       "kategori": "iPhone",
@@ -900,22 +932,6 @@
     },
     {
       "kategori": "iPhone",
-      "kode": "APPMJRY4ID/A",
-      "nama": "IPHONE 18 PRO 1TB BLACK",
-      "stok": 1,
-      "baris": 1,
-      "qtyKolom": 1
-    },
-    {
-      "kategori": "iPhone",
-      "kode": "APPMJT04ID/A",
-      "nama": "IPHONE 18 PRO 1TB SILVER",
-      "stok": 1,
-      "baris": 1,
-      "qtyKolom": 1
-    },
-    {
-      "kategori": "iPhone",
       "kode": "APPMJRP4ID/A",
       "nama": "IPHONE 18 PRO 256GB BLACK",
       "stok": 19,
@@ -926,25 +942,25 @@
       "kategori": "iPhone",
       "kode": "APPMJRR4ID/A",
       "nama": "IPHONE 18 PRO 256GB BURGUNDY",
-      "stok": 37,
-      "baris": 37,
-      "qtyKolom": 37
+      "stok": 25,
+      "baris": 25,
+      "qtyKolom": 25
     },
     {
       "kategori": "iPhone",
       "kode": "APPMJRT4ID/A",
       "nama": "IPHONE 18 PRO 256GB GLACIER",
-      "stok": 19,
-      "baris": 19,
-      "qtyKolom": 19
+      "stok": 14,
+      "baris": 14,
+      "qtyKolom": 14
     },
     {
       "kategori": "iPhone",
       "kode": "APPMJRQ4ID/A",
       "nama": "IPHONE 18 PRO 256GB SILVER",
-      "stok": 11,
-      "baris": 11,
-      "qtyKolom": 11
+      "stok": 6,
+      "baris": 6,
+      "qtyKolom": 6
     },
     {
       "kategori": "iPhone",
@@ -982,62 +998,38 @@
       "kategori": "iPhone",
       "kode": "APPMJRW4ID/A",
       "nama": "IPHONE 18 PRO 512GB BURGUNDY",
-      "stok": 9,
-      "baris": 9,
-      "qtyKolom": 9
-    },
-    {
-      "kategori": "iPhone",
-      "kode": "APPMJRV4ID/A",
-      "nama": "IPHONE 18 PRO 512GB SILVER",
-      "stok": 2,
-      "baris": 2,
-      "qtyKolom": 2
+      "stok": 1,
+      "baris": 1,
+      "qtyKolom": 1
     },
     {
       "kategori": "iPhone",
       "kode": "APPMJXN4ID/A",
       "nama": "IPHONE 18 PRO MAX 256GB BLACK",
-      "stok": 23,
-      "baris": 23,
-      "qtyKolom": 23
-    },
-    {
-      "kategori": "iPhone",
-      "kode": "APPMJXQ4ID/A",
-      "nama": "IPHONE 18 PRO MAX 256GB BURGUNDY",
-      "stok": 15,
-      "baris": 15,
-      "qtyKolom": 15
+      "stok": 21,
+      "baris": 21,
+      "qtyKolom": 21
     },
     {
       "kategori": "iPhone",
       "kode": "APPMJXR4ID/A",
       "nama": "IPHONE 18 PRO MAX 256GB GLACIER",
-      "stok": 39,
-      "baris": 39,
-      "qtyKolom": 39
+      "stok": 31,
+      "baris": 31,
+      "qtyKolom": 31
     },
     {
       "kategori": "iPhone",
       "kode": "APPMJXP4ID/A",
       "nama": "IPHONE 18 PRO MAX 256GB SILVER",
-      "stok": 15,
-      "baris": 15,
-      "qtyKolom": 15
+      "stok": 13,
+      "baris": 13,
+      "qtyKolom": 13
     },
     {
       "kategori": "iPhone",
       "kode": "APPMG2P4ID/A",
       "nama": "IPHONE AIR 256GB SKY BLUE",
-      "stok": 3,
-      "baris": 3,
-      "qtyKolom": 3
-    },
-    {
-      "kategori": "iPhone",
-      "kode": "APPMG2L4ID/A",
-      "nama": "IPHONE AIR 256GB SPACE BLACK",
       "stok": 1,
       "baris": 1,
       "qtyKolom": 1
